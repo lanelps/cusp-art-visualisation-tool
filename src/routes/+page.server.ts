@@ -5,10 +5,8 @@ import { fetchWeatherData } from '$lib/metservice';
 
 export const load: PageServerLoad = async () => {
 	const data = await fetchWeatherData();
-	console.log(data);
-	console.log(data.variables);
 
-	return {};
+	return { weather: data };
 
 	// error(404, 'Not found');
 };
