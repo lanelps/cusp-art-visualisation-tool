@@ -5,6 +5,9 @@
 	const waveHeight = data.weather.variables['wave.height'];
 	const windSpeed = data.weather.variables['wind.speed.at-100m'];
 
+	console.log(`waveHeight`, waveHeight);
+	console.log(`windSpeed`, windSpeed);
+
 	const mapWaveHeight = (waveHeight: number) => {
 		// Map wave height from 0-15m to 0-100
 		let mappedHeight = (waveHeight / 15) * 100;
@@ -37,15 +40,30 @@
 	let cloudOpacity = mapCloudOpacity(cloudCover.data[0]);
 </script>
 
-<section class="flex items-center justify-center w-full h-screen">
-	<div
-		style="--scale-y: {waveHeightTransform}%; --opacity: {cloudOpacity};"
-		class="wave w-16 h-16 bg-blue-500 rounded-full opacity-[var(--opacity)]"
-	/>
-	<div
-		style="--scale-x: {windWidthTransform}%; --opacity: {cloudOpacity};"
-		class="wind w-16 h-16 bg-red-500 rounded-full opacity-[var(--opacity)]"
-	/>
+<section class="flex w-full h-screen">
+	<div class="relative flex items-center justify-center w-full h-full">
+		<div
+			style="--scale-y: {waveHeightTransform}%; --opacity: {cloudOpacity};"
+			class="wave relative w-16 h-16 bg-blue-500 rounded-full opacity-[var(--opacity)]"
+		/>
+		<p class="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+			Wave Height:
+			{waveHeight.data[0]}
+			{waveHeight.units}
+		</p>
+	</div>
+
+	<div class="relative flex items-center justify-center w-full h-full">
+		<div
+			style="--scale-x: {windWidthTransform}%; --opacity: {cloudOpacity};"
+			class="wind w-16 h-16 bg-red-500 rounded-full opacity-[var(--opacity)]"
+		/>
+		<p class="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+			Wind Speed:
+			{windSpeed.data[0]}
+			{windSpeed.units}
+		</p>
+	</div>
 </section>
 
 <style>
