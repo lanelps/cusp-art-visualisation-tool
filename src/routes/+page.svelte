@@ -37,7 +37,7 @@
 	let cloudOpacity = mapCloudOpacity(cloudCover.data[0]);
 </script>
 
-<h1 class="w-full text-2xl font-bold text-center">Lyttleton Weather</h1>
+<h1 class="w-full text-2xl font-bold text-center">Lyttelton Weather</h1>
 <section class="flex w-full h-screen">
 	<div class="relative flex items-center justify-center w-full h-full">
 		<div
