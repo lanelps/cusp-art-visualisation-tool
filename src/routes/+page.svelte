@@ -1,8 +1,6 @@
 <script lang="ts">
 	export let data;
 
-	console.log(data.weather.variables);
-
 	const cloudCover = data.weather.variables['cloud.cover'];
 	const waveHeight = data.weather.variables['wave.height'];
 	const windSpeed = data.weather.variables['wind.speed.at-100m'];
@@ -39,13 +37,41 @@
 	let cloudOpacity = mapCloudOpacity(cloudCover.data[0]);
 </script>
 
-<section class="w-full h-screen flex items-center justify-center">
+<section class="flex items-center justify-center w-full h-screen">
 	<div
 		style="--scale-y: {waveHeightTransform}%; --opacity: {cloudOpacity};"
-		class="w-16 h-16 bg-blue-500 rounded-full scale-y-[var(--scale-y)] opacity-[var(--opacity)]"
+		class="wave w-16 h-16 bg-blue-500 rounded-full opacity-[var(--opacity)]"
 	/>
 	<div
 		style="--scale-x: {windWidthTransform}%; --opacity: {cloudOpacity};"
-		class="w-16 h-16 bg-red-500 rounded-full scale-x-[var(--scale-x)] opacity-[var(--opacity)]"
+		class="wind w-16 h-16 bg-red-500 rounded-full opacity-[var(--opacity)]"
 	/>
 </section>
+
+<style>
+	@keyframes waveHeightAnimation {
+		0% {
+			transform: scaleY(100%);
+		}
+		100% {
+			transform: scaleY(var(--scale-y));
+		}
+	}
+
+	@keyframes windWidthAnimation {
+		0% {
+			transform: scaleX(100%);
+		}
+		100% {
+			transform: scaleX(var(--scale-x));
+		}
+	}
+
+	.wave {
+		animation: waveHeightAnimation 2s infinite alternate;
+	}
+
+	.wind {
+		animation: windWidthAnimation 2s infinite alternate;
+	}
+</style>
