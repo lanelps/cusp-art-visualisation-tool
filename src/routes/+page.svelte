@@ -5,9 +5,6 @@
 	const waveHeight = data.weather.variables['wave.height'];
 	const windSpeed = data.weather.variables['wind.speed.at-100m'];
 
-	console.log(`waveHeight`, waveHeight);
-	console.log(`windSpeed`, windSpeed);
-
 	const mapWaveHeight = (waveHeight: number) => {
 		// Map wave height from 0-15m to 0-100
 		let mappedHeight = (waveHeight / 15) * 100;
@@ -40,6 +37,7 @@
 	let cloudOpacity = mapCloudOpacity(cloudCover.data[0]);
 </script>
 
+<h1 class="w-full text-2xl font-bold text-center">Lyttleton Weather</h1>
 <section class="flex w-full h-screen">
 	<div class="relative flex items-center justify-center w-full h-full">
 		<div
