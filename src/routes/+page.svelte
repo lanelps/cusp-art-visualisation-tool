@@ -1,4 +1,6 @@
 <script lang="ts">
+	import YouTubePlayer from '$lib/components/YouTubePlayer.svelte';
+
 	export let data;
 
 	const cloudCover = data.weather.variables['cloud.cover'];
@@ -39,7 +41,8 @@
 
 <h1 class="w-full text-2xl font-bold text-center">Lyttelton Weather</h1>
 <section class="flex w-full h-screen">
-	<div class="relative flex items-center justify-center w-full h-full">
+	<YouTubePlayer />
+	<div class="relative z-10 flex items-center justify-center w-full h-full">
 		<div
 			style="--scale-y: {waveHeightTransform}%; --opacity: {cloudOpacity};"
 			class="wave relative w-16 h-16 bg-blue-500 rounded-full opacity-[var(--opacity)]"
@@ -51,7 +54,7 @@
 		</p>
 	</div>
 
-	<div class="relative flex items-center justify-center w-full h-full">
+	<div class="relative z-10 flex items-center justify-center w-full h-full">
 		<div
 			style="--scale-x: {windWidthTransform}%; --opacity: {cloudOpacity};"
 			class="wind w-16 h-16 bg-red-500 rounded-full opacity-[var(--opacity)]"
