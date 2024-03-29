@@ -41,31 +41,45 @@
 
 <YouTubePlayer />
 <section class="relative z-10 w-full h-screen">
-	<h1 class="w-full text-2xl font-bold text-center">Lyttelton Weather</h1>
+	<div
+		class="absolute flex flex-col items-center gap-2 text-center text-white -translate-x-1/2 top-4 left-1/2"
+	>
+		<h1 class="p-2 text-2xl font-bold bg-black w-max">Lyttelton Weather</h1>
+
+		<p class="p-2 bg-black w-max">Cloud coverage {cloudCover.data[0]} {cloudCover.units}</p>
+	</div>
 
 	<div class="flex w-full h-full">
 		<div class="relative flex items-center justify-center w-full h-full">
-			<div
-				style="--scale-y: {waveHeightTransform}%; --opacity: {cloudOpacity};"
-				class="relative w-16 h-16 bg-blue-500 rounded-full wave"
-			/>
-			<p class="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-				Wave Height:
-				{waveHeight.data[0]}
-				{waveHeight.units}
-			</p>
+			<div class="relative">
+				<div
+					style="--scale-y: {waveHeightTransform}%; --opacity: {cloudOpacity};"
+					class="relative w-16 h-16 bg-blue-500 rounded-full wave opacity-[var(--opacity)]"
+				/>
+				<p
+					class="absolute p-2 text-white -translate-x-1/2 bg-black top-[calc(100%+0.5rem)] left-1/2 w-max"
+				>
+					Wave Height:
+					{waveHeight.data[0]}
+					{waveHeight.units}
+				</p>
+			</div>
 		</div>
 
 		<div class="relative flex items-center justify-center w-full h-full">
-			<div
-				style="--scale-x: {windWidthTransform}%; --opacity: {cloudOpacity};"
-				class="w-16 h-16 bg-red-500 rounded-full wind"
-			/>
-			<p class="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-				Wind Speed:
-				{windSpeed.data[0]}
-				{windSpeed.units}
-			</p>
+			<div class="relative">
+				<div
+					style="--scale-x: {windWidthTransform}%; --opacity: {cloudOpacity};"
+					class="w-16 h-16 bg-red-500 rounded-full wind opacity-[var(--opacity)]"
+				/>
+				<p
+					class="absolute p-2 text-white -translate-x-1/2 bg-black top-[calc(100%+0.5rem)] left-1/2 w-max"
+				>
+					Wind Speed:
+					{windSpeed.data[0]}
+					{windSpeed.units}
+				</p>
+			</div>
 		</div>
 	</div>
 </section>
