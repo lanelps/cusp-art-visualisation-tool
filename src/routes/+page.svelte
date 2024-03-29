@@ -40,30 +40,33 @@
 </script>
 
 <YouTubePlayer />
-<section class="relative z-10 flex w-full h-screen">
+<section class="relative z-10 w-full h-screen">
 	<h1 class="w-full text-2xl font-bold text-center">Lyttelton Weather</h1>
-	<div class="relative flex items-center justify-center w-full h-full">
-		<div
-			style="--scale-y: {waveHeightTransform}%; --opacity: {cloudOpacity};"
-			class="wave relative w-16 h-16 bg-blue-500 rounded-full opacity-[var(--opacity)]"
-		/>
-		<p class="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-			Wave Height:
-			{waveHeight.data[0]}
-			{waveHeight.units}
-		</p>
-	</div>
 
-	<div class="relative flex items-center justify-center w-full h-full">
-		<div
-			style="--scale-x: {windWidthTransform}%; --opacity: {cloudOpacity};"
-			class="wind w-16 h-16 bg-red-500 rounded-full opacity-[var(--opacity)]"
-		/>
-		<p class="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-			Wind Speed:
-			{windSpeed.data[0]}
-			{windSpeed.units}
-		</p>
+	<div class="flex w-full h-full">
+		<div class="relative flex items-center justify-center w-full h-full">
+			<div
+				style="--scale-y: {waveHeightTransform}%; --opacity: {cloudOpacity};"
+				class="relative w-16 h-16 bg-blue-500 rounded-full wave"
+			/>
+			<p class="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+				Wave Height:
+				{waveHeight.data[0]}
+				{waveHeight.units}
+			</p>
+		</div>
+
+		<div class="relative flex items-center justify-center w-full h-full">
+			<div
+				style="--scale-x: {windWidthTransform}%; --opacity: {cloudOpacity};"
+				class="w-16 h-16 bg-red-500 rounded-full wind"
+			/>
+			<p class="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+				Wind Speed:
+				{windSpeed.data[0]}
+				{windSpeed.units}
+			</p>
+		</div>
 	</div>
 </section>
 
