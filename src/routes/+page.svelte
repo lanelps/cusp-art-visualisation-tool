@@ -39,10 +39,10 @@
 	let cloudOpacity = mapCloudOpacity(cloudCover.data[0]);
 </script>
 
-<h1 class="w-full text-2xl font-bold text-center">Lyttelton Weather</h1>
-<section class="flex w-full h-screen">
-	<YouTubePlayer />
-	<div class="relative z-10 flex items-center justify-center w-full h-full">
+<YouTubePlayer />
+<section class="relative z-10 flex w-full h-screen">
+	<h1 class="w-full text-2xl font-bold text-center">Lyttelton Weather</h1>
+	<div class="relative flex items-center justify-center w-full h-full">
 		<div
 			style="--scale-y: {waveHeightTransform}%; --opacity: {cloudOpacity};"
 			class="wave relative w-16 h-16 bg-blue-500 rounded-full opacity-[var(--opacity)]"
@@ -54,7 +54,7 @@
 		</p>
 	</div>
 
-	<div class="relative z-10 flex items-center justify-center w-full h-full">
+	<div class="relative flex items-center justify-center w-full h-full">
 		<div
 			style="--scale-x: {windWidthTransform}%; --opacity: {cloudOpacity};"
 			class="wind w-16 h-16 bg-red-500 rounded-full opacity-[var(--opacity)]"
