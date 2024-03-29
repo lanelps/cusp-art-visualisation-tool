@@ -22,8 +22,8 @@
 		players = videoIDs.map(
 			(id, index) =>
 				new YT.Player(`player${index}`, {
-					width: '1440',
-					height: '900',
+					width: window.innerWidth,
+					height: window.innerHeight,
 					videoId: id,
 					events: {
 						onReady: (event) => event.target.playVideo()
@@ -35,7 +35,7 @@
 	});
 </script>
 
-<div class="absolute w-full h-full">
+<div class="absolute w-screen h-screen">
 	{#each videoIDs as _, index (index)}
 		<div
 			class="absolute w-full h-full transition-opacity -translate-x-1/2 -translate-y-1/2 opacity-0 top-1/2 left-1/2"
