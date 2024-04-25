@@ -2,18 +2,22 @@
 	import { onMount } from 'svelte';
 	// import YouTubePlayer from '$lib/components/YouTubePlayer.svelte';
 	// import MuxVideo from '$lib/components/MuxVideo.svelte';
-	import lytDayVid from '$lib/assets/lyt-day.mp4';
+
 	import lytDayBG from '$lib/assets/lyt-day.png';
-	import lytDayCloud from '$lib/assets/lyt-day-cloud.png';
+	import lytDayCloud from '$lib/assets/lyt-day-clouds.png';
 	import lytDayWaves from '$lib/assets/lyt-day-waves.png';
 
-	import lytEveningVid from '$lib/assets/lyt-evening.mp4';
-	import lytEveningCloud from '$lib/assets/lyt-evening-cloud.png';
-	import lytEveningWaves from '$lib/assets/lyt-evening-waves.png';
+	import lytSunsetBG from '$lib/assets/lyt-sunset.png';
+	import lytSunsetCloud from '$lib/assets/lyt-sunset-clouds.png';
+	import lytSunsetWaves from '$lib/assets/lyt-sunset-waves.png';
 
-	import lytNightVid from '$lib/assets/lyt-night.mp4';
+	import lytNightBG from '$lib/assets/lyt-night.png';
+	import lytNightCloud from '$lib/assets/lyt-night-clouds.png';
+	import lytNightWaves from '$lib/assets/lyt-sunset-waves.png';
 
 	import lytBirds from '$lib/assets/lyt-birds.gif';
+	import lytBoat from '$lib/assets/lyt-boat.gif';
+	import ltyLights from '$lib/assets/lyt-lights.gif';
 
 	export let data;
 
@@ -21,6 +25,15 @@
 	let wave = data.wave.height || 0;
 	let wind = data.wind.speed || 0;
 	let direction = data.wind.direction || 0;
+
+	const phases = {
+		day: { bg: lytDayBG, cloud: lytDayCloud, waves: lytDayWaves, boat: lytBoat },
+		sunset: { bg: lytSunsetBG, cloud: lytSunsetCloud, waves: lytSunsetWaves, lights: ltyLights },
+		night: { bg: lytNightBG, cloud: lytNightCloud, waves: lytNightWaves, lights: ltyLights }
+	};
+
+	let timeofDay = 'day';
+	$: activePhase = phases[timeofDay];
 
 	const MAX_CLOUD_COVERAGE = 100;
 	const MAX_WAVE_HEIGHT = 15;
@@ -119,31 +132,52 @@
 	playbackId="01wESwLxbelt01vYMQ01xxKoiKQQVacEvU02WE8se8dYG3g"
 	metaData={{ videoTitle: 'Lyttelton Weather' }}
 /> -->
-<div class="absolute w-screen h-screen overflow-hidden pointer-events-none">
-	<!-- <img src={lytDayBG} alt="Lyttelton Day" class="absolute w-full h-full" /> -->
-	<video
-		src={lytEveningVid}
-		title="Lyttelton Day"
-		class="absolute object-cover w-full h-full"
-		autoplay
-		loop
-		muted
-	/>
+<div class="absolute w-screen h-screen overflow-hidden pointer-events-none aspect-video">
 	<img
-		src={lytEveningCloud}
-		alt="Lyttelton Day Cloud"
-		style="--opacity: {cloudOpacity};"
-		class="absolute w-full h-full opacity-[var(--opacity)]"
-	/>
-	<div style="--wave-height: {waveHeightTransform}%;" class="absolute w-full h-full">
-		<img src={lytEveningWaves} alt="Lyttelton Day Waves" class="absolute w-full h-full" />
-		<img src={lytEveningWaves} alt="Lyttelton Day Waves" class="absolute w-full h-full wave" />
+		src={activePhase.bg}
+		alt="Lyttelton Background"
+		class="absolute top-0 left-0 object-cover w-full h-full"
+	/>/
+	<div style="--wave-height: {waveHeightTransform}%;" class="absolute top-0 left-0 w-full h-full">
+		<img
+			src={activePhase.waves}
+			alt="Lyttelton Day Waves"
+			class="absolute object-cover w-full h-full"
+		/>
+		<img
+			src={activePhase.waves}
+			alt="Lyttelton Day Waves"
+			class="absolute object-cover w-full h-full wave"
+		/>
 	</div>
+	<img
+		src={activePhase.cloud}
+		alt="Lyttelton Cloud"
+		style="--opacity: {cloudOpacity};"
+		class="absolute w-full h-full opacity-[var(--opacity)] top-0 left-0 object-cover"
+	/>
+
+	{#if activePhase?.lights}
+		<img
+			src={activePhase.lights}
+			alt="Lyttelton Lights"
+			class="absolute top-0 left-0 object-cover w-full h-full"
+		/>
+	{/if}
+
+	{#if activePhase?.boat}
+		<img
+			src={activePhase.boat}
+			alt="Lyttelton Boat"
+			class="absolute top-0 left-0 object-cover w-full h-full"
+		/>
+	{/if}
+
 	<img
 		bind:this={birds}
 		src={lytBirds}
 		alt="Birds"
-		class="absolute w-[25vw] h-auto pointer-events-none"
+		class="absolute w-[25vw] h-auto pointer-events-none object-cover"
 	/>
 </div>
 
@@ -172,6 +206,15 @@
 			Wind Direction: {direction}°
 		</p>
 		<input type="range" min="0" max="360" step="1" bind:value={direction} />
+	</div>
+
+	<div>
+		<p>Time Of Day</p>
+		<select bind:value={timeofDay} class="px-2 py-1 bg-transparent border border-white">
+			{#each Object.keys(phases) as phase}
+				<option value={phase}>{phase}</option>
+			{/each}
+		</select>
 	</div>
 </section>
 
