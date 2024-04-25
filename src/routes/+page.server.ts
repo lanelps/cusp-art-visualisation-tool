@@ -11,13 +11,13 @@ export const load: PageServerLoad = async () => {
 	// const { data } = await fetchTomorrowWeatherData();
 
 	const weather = {
-		cloud: data.variables['cloud.cover'].data[0],
+		cloud: parseFloat(data.variables['cloud.cover'].data[0]).toFixed(2),
 		wind: {
-			speed: data.variables['wind.speed.at-100m'].data[0] * 3.6,
-			direction: data.variables['wind.direction.at-100m'].data[0]
+			speed: parseFloat(data.variables['wind.speed.at-100m'].data[0]).toFixed(2) * 3.6,
+			direction: parseFloat(data.variables['wind.direction.at-100m'].data[0]).toFixed(2)
 		},
 		wave: {
-			height: data.variables['wave.height'].data[0]
+			height: parseFloat(data.variables['wave.height'].data[0]).toFixed(2)
 		}
 	};
 
