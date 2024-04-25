@@ -32,8 +32,8 @@
 		night: { bg: lytNightBG, cloud: lytNightCloud, waves: lytNightWaves, lights: ltyLights }
 	};
 
-	let timeofDay = 'day';
-	$: activePhase = phases[timeofDay];
+	let timeOfDay = 'day';
+	$: activePhase = phases[timeOfDay];
 
 	let infoActive = false;
 
@@ -246,7 +246,7 @@
 				<div>
 					<h3 class="mb-2">Time Of Day</h3>
 					<select
-						bind:value={timeofDay}
+						bind:value={timeOfDay}
 						class="w-full px-2 py-1 capitalize bg-transparent border border-white"
 					>
 						{#each Object.keys(phases) as phase}
