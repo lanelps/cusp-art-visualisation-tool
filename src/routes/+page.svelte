@@ -17,19 +17,25 @@
 
 	export let data;
 
-	const cloudCover = data.weather.variables['cloud.cover'];
-	const waveHeight = data.weather.variables['wave.height'];
-	const windSpeed = data.weather.variables['wind.speed.at-100m'];
-	const windDirection = data.weather.variables['wind.direction.at-100m'];
+	let cloud = data.cloud || 0;
+	let wave = data.wave.height || 0;
+	let wind = data.wind.speed || 0;
+	let direction = data.wind.direction || 0;
 
-	let cloud = cloudCover.data[0];
-	let wave = waveHeight.data[0];
-	let wind = windSpeed.data[0];
-	let direction = windDirection.data[0];
+	const MAX_CLOUD_COVERAGE = 100;
+	const MAX_WAVE_HEIGHT = 15;
+	const MAX_WIND_SPEED = 100;
+
+	const mapCloudOpacity = (cloudCover: number) => {
+		// cloud cover is a percentage from 0-100
+		// 100 is fully covered, 0 is clear
+		// 100 is 100 opacity, 0 is 1 opacity
+		return cloudCover / MAX_CLOUD_COVERAGE;
+	};
 
 	const mapWaveHeight = (waveHeight: number) => {
 		// Map wave height from 0-15m to 0-100
-		let mappedHeight = (waveHeight / 8) * 100;
+		let mappedHeight = (waveHeight / MAX_WAVE_HEIGHT) * 100;
 
 		// Map 0-100 to 0% - 10%
 		let percentageHeight = mappedHeight * 0.1;
@@ -38,27 +44,20 @@
 	};
 
 	const mapWindSpeed = (windSpeed: number) => {
-		// Map wind speed from 0-30m/s to 0-100
-		let mappedSpeed = (windSpeed / 30) * 100;
+		// Map wind speed from 0-100m/s to 0-100
+		let mappedSpeed = (windSpeed / MAX_WIND_SPEED) * 100;
 
 		// Map 0-100 to 0-0.05
-		let percentageSpeed = mappedSpeed * 0.0005;
+		let percentageSpeed = mappedSpeed * 0.001;
 
 		return percentageSpeed;
-	};
-
-	const mapCloudOpacity = (cloudCover: number) => {
-		// cloud cover is a percentage from 0-100
-		// 100 is fully covered, 0 is clear
-		// 100 is 100 opacity, 0 is 1 opacity
-		return cloudCover / 100;
 	};
 
 	$: cloudOpacity = mapCloudOpacity(cloud);
 	$: waveHeightTransform = mapWaveHeight(wave);
 
-	let windSpeedTransform;
-	let windDirectionTransform;
+	let windSpeedTransform: number = 0;
+	let windDirectionTransform: number = 0;
 
 	let birds: HTMLDivElement | null = null;
 	let t = 0;
@@ -123,7 +122,7 @@
 <div class="absolute w-screen h-screen overflow-hidden pointer-events-none">
 	<!-- <img src={lytDayBG} alt="Lyttelton Day" class="absolute w-full h-full" /> -->
 	<video
-		src={lytDayVid}
+		src={lytEveningVid}
 		title="Lyttelton Day"
 		class="absolute object-cover w-full h-full"
 		autoplay
@@ -131,14 +130,14 @@
 		muted
 	/>
 	<img
-		src={lytDayCloud}
+		src={lytEveningCloud}
 		alt="Lyttelton Day Cloud"
 		style="--opacity: {cloudOpacity};"
 		class="absolute w-full h-full opacity-[var(--opacity)]"
 	/>
 	<div style="--wave-height: {waveHeightTransform}%;" class="absolute w-full h-full">
-		<img src={lytDayWaves} alt="Lyttelton Day Waves" class="absolute w-full h-full" />
-		<img src={lytDayWaves} alt="Lyttelton Day Waves" class="absolute w-full h-full wave" />
+		<img src={lytEveningWaves} alt="Lyttelton Day Waves" class="absolute w-full h-full" />
+		<img src={lytEveningWaves} alt="Lyttelton Day Waves" class="absolute w-full h-full wave" />
 	</div>
 	<img
 		bind:this={birds}
@@ -150,33 +149,27 @@
 
 <section class="relative z-10 p-3 text-white bg-black w-max top-4 left-4">
 	<div>
-		<p>Cloud Coverage: {cloud} {cloudCover.units}</p>
-		<input type="range" min="0" max="100" step="1" bind:value={cloud} />
+		<p>Cloud Coverage: {cloud}%</p>
+		<input type="range" min="0" max={MAX_CLOUD_COVERAGE} step="1" bind:value={cloud} />
 	</div>
 
 	<div>
 		<p>
-			Wave Height:
-			{wave}
-			{waveHeight.units}
+			Wave Height: {wave} Metres
 		</p>
 		<input type="range" min="0" max="15" step="0.1" bind:value={wave} />
 	</div>
 
 	<div>
 		<p>
-			Wind Speed:
-			{wind}
-			{windSpeed.units}
+			Wind Speed: {wind} km/h
 		</p>
-		<input type="range" min="0" max="30" step="0.1" bind:value={wind} />
+		<input type="range" min="0" max={MAX_WIND_SPEED} step="0.1" bind:value={wind} />
 	</div>
 
 	<div>
 		<p>
-			Wind Direction:
-			{direction}
-			{windDirection.units}
+			Wind Direction: {direction}°
 		</p>
 		<input type="range" min="0" max="360" step="1" bind:value={direction} />
 	</div>
