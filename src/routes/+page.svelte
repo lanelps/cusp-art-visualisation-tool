@@ -21,10 +21,10 @@
 
 	export let data;
 
-	let cloud = data.cloud || 0;
-	let wave = data.wave.height || 0;
-	let wind = data.wind.speed || 0;
-	let direction = data.wind.direction || 0;
+	let cloud = data.weather.cloud || 0;
+	let wave = data.weather.wave.height || 0;
+	let wind = data.weather.wind.speed || 0;
+	let direction = data.weather.wind.direction || 0;
 
 	const phases = {
 		day: { bg: lytDayBG, cloud: lytDayCloud, waves: lytDayWaves, boat: lytBoat },
@@ -32,7 +32,7 @@
 		night: { bg: lytNightBG, cloud: lytNightCloud, waves: lytNightWaves, lights: ltyLights }
 	};
 
-	let timeOfDay: 'day' | 'sunset' | 'night' = 'day'; // Explicitly type timeOfDay to avoid 'any' type
+	let timeOfDay: 'day' | 'sunset' | 'night' = data?.timeOfDay as 'day' | 'sunset' | 'night'; // Explicitly type timeOfDay to avoid 'any' type
 	$: activePhase = phases[timeOfDay];
 	let manualOverride = false;
 

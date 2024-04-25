@@ -43,5 +43,22 @@ export const load: PageServerLoad = async () => {
 	// 	}
 	// };
 
-	return weather;
+	const getTimeOfDay = () => {
+		const now = new Date();
+		const currentHour = now.getHours();
+		const currentMinute = now.getMinutes();
+
+		if (currentHour >= 6 && currentHour < 17) {
+			// if between 6am and 5pm, it's day
+			return 'day';
+		} else if (currentHour === 17 && currentMinute >= 0 && currentMinute <= 30) {
+			// if between 5pm and 5:30pm, it's sunset
+			return 'sunset';
+		} else {
+			// otherwise, it's night
+			return 'night';
+		}
+	};
+
+	return { weather, timeOfDay: getTimeOfDay() };
 };
