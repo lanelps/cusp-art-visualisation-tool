@@ -32,7 +32,7 @@
 		night: { bg: lytNightBG, cloud: lytNightCloud, waves: lytNightWaves, lights: ltyLights }
 	};
 
-	let timeOfDay = 'day';
+	let timeOfDay: 'day' | 'sunset' | 'night' = 'day'; // Explicitly type timeOfDay to avoid 'any' type
 	$: activePhase = phases[timeOfDay];
 
 	let infoActive = false;
@@ -66,6 +66,26 @@
 		let percentageSpeed = mappedSpeed * 0.001;
 
 		return percentageSpeed;
+	};
+
+	// Function to update timeOfDay based on current time
+	const updateTimeOfDay = () => {
+		const now = new Date();
+		const currentHour = now.getHours();
+		const currentMinute = now.getMinutes();
+
+		if (currentHour >= 6 && currentHour < 17) {
+			// if between 6am and 5pm, it's day
+			timeOfDay = 'day';
+		} else if (currentHour === 17 && currentMinute >= 0 && currentMinute <= 30) {
+			// if between 5pm and 5:30pm, it's sunset
+			timeOfDay = 'sunset';
+		} else {
+			// otherwise, it's night
+			timeOfDay = 'night';
+		}
+
+		activePhase = phases[timeOfDay];
 	};
 
 	$: cloudOpacity = mapCloudOpacity(cloud);
@@ -116,6 +136,15 @@
 			requestAnimationFrame(animate);
 		};
 		animate();
+
+		// Update timeOfDay immediately on mount
+		updateTimeOfDay();
+
+		// Then update timeOfDay every second
+		const intervalId = setInterval(updateTimeOfDay, 1000);
+
+		// Clear interval on component unmount
+		return () => clearInterval(intervalId);
 	});
 
 	// Reactive statement to update position when state changes
