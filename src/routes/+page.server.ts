@@ -1,6 +1,7 @@
 // import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
+import moment from 'moment-timezone';
 import { fetchWeatherData } from '$lib/weather/metservice';
 // import { fetchOpenWeatherData } from '$lib/weather/openweather';
 // import { fetchTomorrowWeatherData } from '$lib/weather/tomorrow';
@@ -43,10 +44,9 @@ export const load: PageServerLoad = async () => {
 	// 	}
 	// };
 
-	const getTimeOfDay = () => {
-		const now = new Date();
-		const currentHour = now.getHours();
-		const currentMinute = now.getMinutes();
+	const getTimeOfDay = (time: moment.Moment) => {
+		const currentHour = time.hour();
+		const currentMinute = time.minute();
 
 		if (currentHour >= 6 && currentHour < 17) {
 			// if between 6am and 5pm, it's day
@@ -60,5 +60,8 @@ export const load: PageServerLoad = async () => {
 		}
 	};
 
-	return { weather, timeOfDay: getTimeOfDay() };
+	// Get the current time in New York
+	const dataTime: moment.Moment = moment().tz('Pacific/Auckland');
+
+	return { weather, timeOfDay: getTimeOfDay(dataTime) };
 };

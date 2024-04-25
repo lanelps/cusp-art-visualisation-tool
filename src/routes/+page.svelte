@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import moment from 'moment-timezone';
 	// import YouTubePlayer from '$lib/components/YouTubePlayer.svelte';
 	// import MuxVideo from '$lib/components/MuxVideo.svelte';
 
@@ -35,6 +36,7 @@
 	let timeOfDay: 'day' | 'sunset' | 'night' = data?.timeOfDay as 'day' | 'sunset' | 'night'; // Explicitly type timeOfDay to avoid 'any' type
 	$: activePhase = phases[timeOfDay];
 	let manualOverride = false;
+	let timeString = moment().tz('Pacific/Auckland').format('HH:mm:ss');
 
 	let infoActive = false;
 
@@ -71,13 +73,15 @@
 
 	// Function to update timeOfDay based on current time
 	const updateTimeOfDay = () => {
+		const currentDate: moment.Moment = moment().tz('Pacific/Auckland');
+		const currentHour = currentDate.hour();
+		const currentMinute = currentDate.minute();
+
+		timeString = currentDate.format('HH:mm:ss');
+
 		if (manualOverride) {
 			return;
 		}
-
-		const now = new Date();
-		const currentHour = now.getHours();
-		const currentMinute = now.getMinutes();
 
 		if (currentHour >= 6 && currentHour < 17) {
 			// if between 6am and 5pm, it's day
@@ -146,11 +150,12 @@
 		};
 		animate();
 
-		// Update timeOfDay immediately on mount
 		updateTimeOfDay();
 
 		// Then update timeOfDay every second
-		const intervalId = setInterval(updateTimeOfDay, 1000);
+		const intervalId = setInterval(() => {
+			updateTimeOfDay();
+		}, 1000);
 
 		// Clear interval on component unmount
 		return () => clearInterval(intervalId);
@@ -283,6 +288,7 @@
 
 				<div>
 					<h3 class="mb-2">Time Of Day</h3>
+					<p class="mb-2">{timeString} Pacific/Auckland</p>
 					<select
 						bind:value={timeOfDay}
 						on:change={handleSelectChange}
