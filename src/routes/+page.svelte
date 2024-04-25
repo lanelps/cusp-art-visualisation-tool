@@ -34,6 +34,7 @@
 
 	let timeOfDay: 'day' | 'sunset' | 'night' = 'day'; // Explicitly type timeOfDay to avoid 'any' type
 	$: activePhase = phases[timeOfDay];
+	let manualOverride = false;
 
 	let infoActive = false;
 
@@ -70,6 +71,10 @@
 
 	// Function to update timeOfDay based on current time
 	const updateTimeOfDay = () => {
+		if (manualOverride) {
+			return;
+		}
+
 		const now = new Date();
 		const currentHour = now.getHours();
 		const currentMinute = now.getMinutes();
@@ -86,6 +91,10 @@
 		}
 
 		activePhase = phases[timeOfDay];
+	};
+
+	const handleSelectChange = () => {
+		manualOverride = true;
 	};
 
 	$: cloudOpacity = mapCloudOpacity(cloud);
@@ -276,6 +285,7 @@
 					<h3 class="mb-2">Time Of Day</h3>
 					<select
 						bind:value={timeOfDay}
+						on:change={handleSelectChange}
 						class="w-full px-2 py-1 capitalize bg-transparent border border-white"
 					>
 						{#each Object.keys(phases) as phase}
