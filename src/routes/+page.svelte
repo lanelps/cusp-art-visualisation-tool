@@ -35,6 +35,8 @@
 	let timeofDay = 'day';
 	$: activePhase = phases[timeofDay];
 
+	let infoActive = false;
+
 	const MAX_CLOUD_COVERAGE = 100;
 	const MAX_WAVE_HEIGHT = 15;
 	const MAX_WIND_SPEED = 100;
@@ -181,40 +183,59 @@
 	/>
 </div>
 
-<section class="relative z-10 p-3 text-white bg-black w-max top-4 left-4">
-	<div>
-		<p>Cloud Coverage: {cloud}%</p>
-		<input type="range" min="0" max={MAX_CLOUD_COVERAGE} step="1" bind:value={cloud} />
-	</div>
+<section class="relative z-10 text-white bg-black w-max top-4 left-4">
+	<button
+		class="flex items-center justify-between w-full py-1 px-3"
+		on:click={() => (infoActive = !infoActive)}
+	>
+		<span>Info</span>
+		<span>
+			{infoActive ? '-' : '+'}
+		</span>
+	</button>
 
-	<div>
-		<p>
-			Wave Height: {wave} Metres
-		</p>
-		<input type="range" min="0" max="15" step="0.1" bind:value={wave} />
-	</div>
+	<div
+		class="grid grid-rows-[0fr] transition-[grid-template-rows]"
+		class:grid-rows-[1fr]={infoActive}
+	>
+		<div class="overflow-hidden">
+			<div class="p-3">
+				<div>
+					<p>Cloud Coverage: {cloud}%</p>
+					<input type="range" min="0" max={MAX_CLOUD_COVERAGE} step="1" bind:value={cloud} />
+				</div>
 
-	<div>
-		<p>
-			Wind Speed: {wind} km/h
-		</p>
-		<input type="range" min="0" max={MAX_WIND_SPEED} step="0.1" bind:value={wind} />
-	</div>
+				<div>
+					<p>
+						Wave Height: {wave} Metres
+					</p>
+					<input type="range" min="0" max="15" step="0.1" bind:value={wave} />
+				</div>
 
-	<div>
-		<p>
-			Wind Direction: {direction}°
-		</p>
-		<input type="range" min="0" max="360" step="1" bind:value={direction} />
-	</div>
+				<div>
+					<p>
+						Wind Speed: {wind} km/h
+					</p>
+					<input type="range" min="0" max={MAX_WIND_SPEED} step="0.1" bind:value={wind} />
+				</div>
 
-	<div>
-		<p>Time Of Day</p>
-		<select bind:value={timeofDay} class="px-2 py-1 bg-transparent border border-white">
-			{#each Object.keys(phases) as phase}
-				<option value={phase}>{phase}</option>
-			{/each}
-		</select>
+				<div>
+					<p>
+						Wind Direction: {direction}°
+					</p>
+					<input type="range" min="0" max="360" step="1" bind:value={direction} />
+				</div>
+
+				<div>
+					<p>Time Of Day</p>
+					<select bind:value={timeofDay} class="px-2 py-1 bg-transparent border border-white">
+						{#each Object.keys(phases) as phase}
+							<option value={phase}>{phase}</option>
+						{/each}
+					</select>
+				</div>
+			</div>
+		</div>
 	</div>
 </section>
 
