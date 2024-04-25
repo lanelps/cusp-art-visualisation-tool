@@ -183,9 +183,12 @@
 	/>
 </div>
 
-<section class="relative z-10 text-white bg-black w-max top-4 left-4">
+<section
+	class="relative z-10 w-[343px] text-white bg-black top-4 left-4 hover:opacity-100 transition-opacity"
+	class:opacity-50={!infoActive}
+>
 	<button
-		class="flex items-center justify-between w-full py-1 px-3"
+		class="flex items-center justify-between w-full px-3 py-1"
 		on:click={() => (infoActive = !infoActive)}
 	>
 		<span>Info</span>
@@ -199,36 +202,53 @@
 		class:grid-rows-[1fr]={infoActive}
 	>
 		<div class="overflow-hidden">
-			<div class="p-3">
+			<div class="flex flex-col gap-2 p-3">
 				<div>
-					<p>Cloud Coverage: {cloud}%</p>
-					<input type="range" min="0" max={MAX_CLOUD_COVERAGE} step="1" bind:value={cloud} />
+					<h3 class="mb-2">Cloud Coverage: {cloud}%</h3>
+					<input
+						class="w-full"
+						type="range"
+						min="0"
+						max={MAX_CLOUD_COVERAGE}
+						step="1"
+						bind:value={cloud}
+					/>
 				</div>
 
 				<div>
-					<p>
+					<h3 class="mb-2">
 						Wave Height: {wave} Metres
-					</p>
-					<input type="range" min="0" max="15" step="0.1" bind:value={wave} />
+					</h3>
+					<input class="w-full" type="range" min="0" max="15" step="0.1" bind:value={wave} />
 				</div>
 
 				<div>
-					<p>
+					<h3 class="mb-2">
 						Wind Speed: {wind} km/h
-					</p>
-					<input type="range" min="0" max={MAX_WIND_SPEED} step="0.1" bind:value={wind} />
+					</h3>
+					<input
+						class="w-full"
+						type="range"
+						min="0"
+						max={MAX_WIND_SPEED}
+						step="0.1"
+						bind:value={wind}
+					/>
 				</div>
 
 				<div>
-					<p>
+					<h3 class="mb-2">
 						Wind Direction: {direction}°
-					</p>
-					<input type="range" min="0" max="360" step="1" bind:value={direction} />
+					</h3>
+					<input class="w-full" type="range" min="0" max="360" step="1" bind:value={direction} />
 				</div>
 
 				<div>
-					<p>Time Of Day</p>
-					<select bind:value={timeofDay} class="px-2 py-1 bg-transparent border border-white">
+					<h3 class="mb-2">Time Of Day</h3>
+					<select
+						bind:value={timeofDay}
+						class="w-full px-2 py-1 capitalize bg-transparent border border-white"
+					>
 						{#each Object.keys(phases) as phase}
 							<option value={phase}>{phase}</option>
 						{/each}
