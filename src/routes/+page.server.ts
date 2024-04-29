@@ -2,10 +2,11 @@
 import type { PageServerLoad } from './$types';
 import type { MetServiceData } from '$lib/types';
 
-import moment from 'moment-timezone';
 import { fetchWeatherData } from '$lib/weather/metservice';
 // import { fetchOpenWeatherData } from '$lib/weather/openweather';
 // import { fetchTomorrowWeatherData } from '$lib/weather/tomorrow';
+
+import { getTimeOfDay } from '$lib/utils/helpers';
 
 export const load: PageServerLoad = async () => {
 	const data: MetServiceData = await fetchWeatherData();
@@ -45,24 +46,5 @@ export const load: PageServerLoad = async () => {
 	// 	}
 	// };
 
-	const getTimeOfDay = (time: moment.Moment) => {
-		const currentHour = time.hour();
-		const currentMinute = time.minute();
-
-		if (currentHour >= 6 && currentHour < 17) {
-			// if between 6am and 5pm, it's day
-			return 'day';
-		} else if (currentHour === 17 && currentMinute >= 0 && currentMinute <= 30) {
-			// if between 5pm and 5:30pm, it's sunset
-			return 'sunset';
-		} else {
-			// otherwise, it's night
-			return 'night';
-		}
-	};
-
-	// Get the current time in New York
-	const dataTime: moment.Moment = moment().tz('Pacific/Auckland');
-
-	return { weather, timeOfDay: getTimeOfDay(dataTime) };
+	return { weather, timeOfDay: getTimeOfDay() };
 };

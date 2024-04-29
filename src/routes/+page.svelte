@@ -5,6 +5,8 @@
 	// import YouTubePlayer from '$lib/components/YouTubePlayer.svelte';
 	// import MuxVideo from '$lib/components/MuxVideo.svelte';
 
+	import { getTimeOfDay } from '$lib/utils/helpers';
+
 	import lytDayBG from '$lib/assets/lyt-day.png';
 	import lytDayCloud from '$lib/assets/lyt-day-clouds.png';
 	import lytDayWaves from '$lib/assets/lyt-day-waves.png';
@@ -42,7 +44,7 @@
 	};
 
 	let timeOfDay: TimeOfDay = data.timeOfDay;
-	let activePhase = timeOfDay ? phases[timeOfDay] : undefined;
+	$: activePhase = timeOfDay ? phases[timeOfDay] : undefined;
 	let manualOverride = false;
 	let timeString = moment().tz('Pacific/Auckland').format('HH:mm:ss');
 
@@ -52,35 +54,24 @@
 
 	// Function to update timeOfDay based on current time
 	const updateTimeOfDay = () => {
-		const currentDate = moment().tz('Pacific/Auckland');
-		const currentHour = currentDate.hour();
-		const currentMinute = currentDate.minute();
-
-		timeString = currentDate.format('HH:mm:ss');
+		timeString = moment().tz('Pacific/Auckland').format('HH:mm:ss');
 
 		if (manualOverride) {
 			return;
 		}
 
-		if (currentHour >= 6 && currentHour < 17) {
-			timeOfDay = 'day';
-		} else if (currentHour === 17 && currentMinute >= 0 && currentMinute <= 30) {
-			timeOfDay = 'sunset';
-		} else {
-			timeOfDay = 'night';
-		}
-
+		timeOfDay = getTimeOfDay();
 		activePhase = phases[timeOfDay];
 	};
 
 	const handleSelectChange = () => {
 		manualOverride = true;
 	};
-	let cloudOpacity = mapValue(cloud, MAX_VALUES.CLOUD_COVERAGE, 1);
-	let waveHeightTransform = mapValue(wave, MAX_VALUES.WAVE_HEIGHT, 0.1) / 2;
+	$: cloudOpacity = mapValue(cloud, MAX_VALUES.CLOUD_COVERAGE, 1);
+	$: waveHeightTransform = mapValue(wave, MAX_VALUES.WAVE_HEIGHT, 100) * 0.1;
 
-	let windSpeedTransform = 0;
-	let windDirectionTransform = 0;
+	$: windSpeedTransform = 0;
+	$: windDirectionTransform = 0;
 
 	let birds: HTMLElement | null = null;
 	let time = 0;
@@ -91,7 +82,7 @@
 
 	// Reactive statements to update windSpeedTransform and windDirectionTransform when state changes
 	$: {
-		windSpeedTransform = mapValue(wind, MAX_VALUES.WIND_SPEED, 0.001);
+		windSpeedTransform = mapValue(wind, MAX_VALUES.WIND_SPEED, 100) * 0.001;
 		windDirectionTransform = direction;
 	}
 
@@ -151,12 +142,12 @@
 	<div style="--wave-height: {waveHeightTransform}%;" class="absolute top-0 left-0 w-full h-full">
 		<img
 			src={activePhase?.waves}
-			alt="Lyttelton Day Waves"
+			alt="Lyttelton Waves"
 			class="absolute object-cover w-full h-full"
 		/>
 		<img
 			src={activePhase?.waves}
-			alt="Lyttelton Day Waves"
+			alt="Lyttelton Waves"
 			class="absolute object-cover w-full h-full wave"
 		/>
 	</div>
