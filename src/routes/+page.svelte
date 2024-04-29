@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Data, Phases, TimeOfDay } from '$lib/types';
 	import { onMount } from 'svelte';
 	import moment from 'moment-timezone';
 	// import YouTubePlayer from '$lib/components/YouTubePlayer.svelte';
@@ -20,60 +21,38 @@
 	import lytBoat from '$lib/assets/lyt-boat.gif';
 	import ltyLights from '$lib/assets/lyt-lights.gif';
 
-	export let data;
+	export let data: Data;
 
-	let cloud = data.weather.cloud || 0;
-	let wave = data.weather.wave.height || 0;
-	let wind = data.weather.wind.speed || 0;
-	let direction = data.weather.wind.direction || 0;
+	let { cloud: cloudStr, wave: waveObj, wind: windObj } = data.weather;
+	let cloud = Number(cloudStr) || 0;
+	let wave = Number(waveObj.height) || 0;
+	let wind = Number(windObj.speed) || 0;
+	let direction = Number(windObj.direction) || 0;
 
-	const phases = {
+	const MAX_VALUES = {
+		CLOUD_COVERAGE: 100,
+		WAVE_HEIGHT: 15,
+		WIND_SPEED: 100
+	};
+
+	const phases: Phases = {
 		day: { bg: lytDayBG, cloud: lytDayCloud, waves: lytDayWaves, boat: lytBoat },
 		sunset: { bg: lytSunsetBG, cloud: lytSunsetCloud, waves: lytSunsetWaves, lights: ltyLights },
 		night: { bg: lytNightBG, cloud: lytNightCloud, waves: lytNightWaves, lights: ltyLights }
 	};
 
-	let timeOfDay: 'day' | 'sunset' | 'night' = data?.timeOfDay as 'day' | 'sunset' | 'night'; // Explicitly type timeOfDay to avoid 'any' type
-	$: activePhase = phases[timeOfDay];
+	let timeOfDay: TimeOfDay = data.timeOfDay;
+	let activePhase = timeOfDay ? phases[timeOfDay] : undefined;
 	let manualOverride = false;
 	let timeString = moment().tz('Pacific/Auckland').format('HH:mm:ss');
 
 	let infoActive = false;
 
-	const MAX_CLOUD_COVERAGE = 100;
-	const MAX_WAVE_HEIGHT = 15;
-	const MAX_WIND_SPEED = 100;
-
-	const mapCloudOpacity = (cloudCover: number) => {
-		// cloud cover is a percentage from 0-100
-		// 100 is fully covered, 0 is clear
-		// 100 is 100 opacity, 0 is 1 opacity
-		return cloudCover / MAX_CLOUD_COVERAGE;
-	};
-
-	const mapWaveHeight = (waveHeight: number) => {
-		// Map wave height from 0-15m to 0-100
-		let mappedHeight = (waveHeight / MAX_WAVE_HEIGHT) * 100;
-
-		// Map 0-100 to 0% - 10%
-		let percentageHeight = mappedHeight * 0.1;
-
-		return percentageHeight / 2;
-	};
-
-	const mapWindSpeed = (windSpeed: number) => {
-		// Map wind speed from 0-100m/s to 0-100
-		let mappedSpeed = (windSpeed / MAX_WIND_SPEED) * 100;
-
-		// Map 0-100 to 0-0.05
-		let percentageSpeed = mappedSpeed * 0.001;
-
-		return percentageSpeed;
-	};
+	const mapValue = (value: number, max: number, factor: number) => (value / max) * factor;
 
 	// Function to update timeOfDay based on current time
 	const updateTimeOfDay = () => {
-		const currentDate: moment.Moment = moment().tz('Pacific/Auckland');
+		const currentDate = moment().tz('Pacific/Auckland');
 		const currentHour = currentDate.hour();
 		const currentMinute = currentDate.minute();
 
@@ -84,13 +63,10 @@
 		}
 
 		if (currentHour >= 6 && currentHour < 17) {
-			// if between 6am and 5pm, it's day
 			timeOfDay = 'day';
 		} else if (currentHour === 17 && currentMinute >= 0 && currentMinute <= 30) {
-			// if between 5pm and 5:30pm, it's sunset
 			timeOfDay = 'sunset';
 		} else {
-			// otherwise, it's night
 			timeOfDay = 'night';
 		}
 
@@ -100,27 +76,22 @@
 	const handleSelectChange = () => {
 		manualOverride = true;
 	};
+	let cloudOpacity = mapValue(cloud, MAX_VALUES.CLOUD_COVERAGE, 1);
+	let waveHeightTransform = mapValue(wave, MAX_VALUES.WAVE_HEIGHT, 0.1) / 2;
 
-	$: cloudOpacity = mapCloudOpacity(cloud);
-	$: waveHeightTransform = mapWaveHeight(wave);
+	let windSpeedTransform = 0;
+	let windDirectionTransform = 0;
 
-	let windSpeedTransform: number = 0;
-	let windDirectionTransform: number = 0;
-
-	let birds: HTMLDivElement | null = null;
-	let t = 0;
-	let scale = 100 * windSpeedTransform * 50; // adjust as needed
-	let speed = windSpeedTransform; // adjust as needed
+	let birds: HTMLElement | null = null;
+	let time = 0;
 	let prevX = 0;
 	let prevY = 0;
-	let lerpFactor = windSpeedTransform; // adjust as needed
 
-	const lerp = (start: number, end: number, factor: number): number =>
-		start + (end - start) * factor;
+	const lerp = (start: number, end: number, factor: number) => start + (end - start) * factor;
 
 	// Reactive statements to update windSpeedTransform and windDirectionTransform when state changes
 	$: {
-		windSpeedTransform = mapWindSpeed(wind);
+		windSpeedTransform = mapValue(wind, MAX_VALUES.WIND_SPEED, 0.001);
 		windDirectionTransform = direction;
 	}
 
@@ -128,21 +99,19 @@
 		const animate = () => {
 			if (!birds) return;
 
-			let scale = 100 * windSpeedTransform * 50; // adjust as needed
-			let speed = windSpeedTransform; // adjust as needed
-			let lerpFactor = windSpeedTransform; // adjust as needed
+			let scale = 100 * windSpeedTransform * 50;
+			let speed = windSpeedTransform;
+			let lerpFactor = windSpeedTransform;
 
-			t += speed;
-			let x = (scale * Math.cos(t)) / (1 + Math.pow(Math.sin(t), 2));
-			let y = (scale * Math.cos(t) * Math.sin(t)) / (1 + Math.pow(Math.sin(t), 2));
+			time += speed;
+			let x = (scale * Math.cos(time)) / (1 + Math.pow(Math.sin(time), 2));
+			let y = (scale * Math.cos(time) * Math.sin(time)) / (1 + Math.pow(Math.sin(time), 2));
 
-			// Apply linear interpolation
 			let lerpX = lerp(prevX, x, lerpFactor);
 			let lerpY = lerp(prevY, y, lerpFactor);
 
 			birds.style.transform = `translate(calc(-50% + ${lerpX}px), calc(-50% + ${lerpY}px))`;
 
-			// Update previous positions
 			prevX = lerpX;
 			prevY = lerpY;
 
@@ -152,20 +121,16 @@
 
 		updateTimeOfDay();
 
-		// Then update timeOfDay every second
-		const intervalId = setInterval(() => {
-			updateTimeOfDay();
-		}, 1000);
+		const intervalId = setInterval(updateTimeOfDay, 1000);
 
-		// Clear interval on component unmount
 		return () => clearInterval(intervalId);
 	});
 
 	// Reactive statement to update position when state changes
 	$: if (birds) {
-		let angle = (windDirectionTransform * Math.PI) / 180; // Convert to radians
-		let originX = `${50 + 50 * Math.sin(angle)}%`; // Use sin for X
-		let originY = `${50 - 50 * Math.cos(angle)}%`; // Use cos for Y and subtract from 50
+		let angle = (windDirectionTransform * Math.PI) / 180;
+		let originX = `${50 + 50 * Math.sin(angle)}%`;
+		let originY = `${50 - 50 * Math.cos(angle)}%`;
 
 		birds.style.left = originX;
 		birds.style.top = originY;
@@ -179,24 +144,24 @@
 /> -->
 <div class="absolute w-screen h-screen overflow-hidden pointer-events-none aspect-video">
 	<img
-		src={activePhase.bg}
+		src={activePhase?.bg}
 		alt="Lyttelton Background"
 		class="absolute top-0 left-0 object-cover w-full h-full"
 	/>/
 	<div style="--wave-height: {waveHeightTransform}%;" class="absolute top-0 left-0 w-full h-full">
 		<img
-			src={activePhase.waves}
+			src={activePhase?.waves}
 			alt="Lyttelton Day Waves"
 			class="absolute object-cover w-full h-full"
 		/>
 		<img
-			src={activePhase.waves}
+			src={activePhase?.waves}
 			alt="Lyttelton Day Waves"
 			class="absolute object-cover w-full h-full wave"
 		/>
 	</div>
 	<img
-		src={activePhase.cloud}
+		src={activePhase?.cloud}
 		alt="Lyttelton Cloud"
 		style="--opacity: {cloudOpacity};"
 		class="absolute w-full h-full opacity-[var(--opacity)] top-0 left-0 object-cover"
@@ -252,7 +217,7 @@
 						class="w-full"
 						type="range"
 						min="0"
-						max={MAX_CLOUD_COVERAGE}
+						max={MAX_VALUES.CLOUD_COVERAGE}
 						step="1"
 						bind:value={cloud}
 					/>
@@ -273,7 +238,7 @@
 						class="w-full"
 						type="range"
 						min="0"
-						max={MAX_WIND_SPEED}
+						max={MAX_VALUES.WIND_SPEED}
 						step="0.1"
 						bind:value={wind}
 					/>

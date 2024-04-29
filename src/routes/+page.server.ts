@@ -1,5 +1,6 @@
 // import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import type { MetServiceData } from '$lib/types';
 
 import moment from 'moment-timezone';
 import { fetchWeatherData } from '$lib/weather/metservice';
@@ -7,14 +8,14 @@ import { fetchWeatherData } from '$lib/weather/metservice';
 // import { fetchTomorrowWeatherData } from '$lib/weather/tomorrow';
 
 export const load: PageServerLoad = async () => {
-	const data = await fetchWeatherData();
+	const data: MetServiceData = await fetchWeatherData();
 	// const data = await fetchOpenWeatherData();
 	// const { data } = await fetchTomorrowWeatherData();
 
 	const weather = {
 		cloud: parseFloat(data.variables['cloud.cover'].data[0]).toFixed(2),
 		wind: {
-			speed: parseFloat(data.variables['wind.speed.at-100m'].data[0]).toFixed(2) * 3.6,
+			speed: (parseFloat(data.variables['wind.speed.at-100m'].data[0]) * 3.6).toFixed(2),
 			direction: parseFloat(data.variables['wind.direction.at-100m'].data[0]).toFixed(2)
 		},
 		wave: {
