@@ -48,6 +48,24 @@
 	let manualOverride = false;
 	let timeString = moment().tz('Pacific/Auckland').format('HH:mm:ss');
 
+	let muxVideo;
+	let showVideo = false;
+
+	// Reactive statement to update showVideo when timeOfDay changes
+	$: {
+		showVideo = timeOfDay === 'sunset';
+	}
+
+	$: {
+		if (muxVideo) {
+			if (showVideo) {
+				muxVideo?.play();
+			} else {
+				muxVideo?.pause();
+			}
+		}
+	}
+
 	let infoActive = false;
 
 	const mapValue = (value: number, max: number, factor: number) => (value / max) * factor;
@@ -128,12 +146,6 @@
 	}
 </script>
 
-<!-- <YouTubePlayer /> -->
-<MuxVideo
-	playbackId="TLBmOhOFtebAXIgu00Z3vjzeMp77oQ0102kNks52QgEu78"
-	metaData={{ videoTitle: 'Lyttelton Weather' }}
-/>
-
 <div class="absolute w-screen h-screen overflow-hidden pointer-events-none aspect-video">
 	<img
 		src={activePhase?.bg}
@@ -180,6 +192,19 @@
 		src={lytBirds}
 		alt="Birds"
 		class="absolute w-[25vw] h-auto pointer-events-none object-cover"
+	/>
+</div>
+
+<div
+	class="absolute w-screen h-screen overflow-hidden transition-opacity duration-1000 opacity-0 pointer-events-none aspect-video"
+	class:opacity-100={showVideo}
+>
+	<MuxVideo
+		bind:this={muxVideo}
+		playbackId="TLBmOhOFtebAXIgu00Z3vjzeMp77oQ0102kNks52QgEu78"
+		metaData={{ videoTitle: 'Lyttelton Weather' }}
+		autoplay={showVideo}
+		on:ended={() => (showVideo = false)}
 	/>
 </div>
 

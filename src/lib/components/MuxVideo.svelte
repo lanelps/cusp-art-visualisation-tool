@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount, createEventDispatcher } from 'svelte';
 	import '@mux/mux-player';
 
 	interface MetaData {
@@ -9,17 +10,45 @@
 	export let playbackId: string;
 	export let metaData: MetaData | undefined;
 	export let controls = false;
+	export let muted = false;
+	export let autoplay = false;
+	export let loop = false;
+
+	let player;
+	const dispatch = createEventDispatcher();
+
+	export const play = () => {
+		player?.media?.nativeEl.play();
+	};
+
+	export const pause = () => {
+		player?.media?.nativeEl.pause();
+	};
+
+	const handleVideoEnded = () => {
+		dispatch('ended');
+	};
+
+	onMount(() => {
+		player?.media?.nativeEl.addEventListener('ended', handleVideoEnded);
+	});
 </script>
 
-<div class="absolute w-screen h-screen overflow-hidden pointer-events-none aspect-video z-[100]">
-	<mux-player
-		class="object-contain w-full h-full"
-		playback-id={playbackId}
-		metadata-video-title={metaData?.videoTitle}
-		metadata-viewer-user-id={metaData?.viewerUserId}
-		{controls}
-		muted
-		autoplay
-		loop
-	/>
-</div>
+<mux-player
+	bind:this={player}
+	class="object-contain w-full h-full"
+	playback-id={playbackId}
+	metadata-video-title={metaData?.videoTitle}
+	metadata-viewer-user-id={metaData?.viewerUserId}
+	{controls}
+	{muted}
+	{autoplay}
+	{loop}
+/>
+
+<style>
+	mux-player {
+		/* --media-object-fit: cover; */
+		--controls: none;
+	}
+</style>
