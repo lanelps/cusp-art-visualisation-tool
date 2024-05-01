@@ -12,6 +12,7 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
+		"@mux/mux-player": "^2.5.0",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/adapter-netlify": "1.0.0-next.88",
 		"@sveltejs/kit": "^2.0.0",
@@ -35,8 +36,5 @@
 		"typescript": "^5.0.0",
 		"vite": "^5.0.3"
 	},
-	"type": "module",
-	"dependencies": {
-		"@mux/mux-video": "^0.17.5"
-	}
+	"type": "module"
 }

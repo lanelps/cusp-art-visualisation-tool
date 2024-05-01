@@ -1,5 +1,5 @@
 <script lang="ts">
-	import '@mux/mux-video';
+	import '@mux/mux-player';
 
 	interface MetaData {
 		videoTitle?: string;
@@ -11,15 +11,15 @@
 	export let controls = false;
 </script>
 
-<div class="absolute w-screen h-screen pointer-events-none">
-	<mux-video
-		class="w-full h-full"
+<div class="absolute w-screen h-screen overflow-hidden pointer-events-none aspect-video z-[100]">
+	<mux-player
+		class="object-contain w-full h-full"
 		playback-id={playbackId}
 		metadata-video-title={metaData?.videoTitle}
 		metadata-viewer-user-id={metaData?.viewerUserId}
 		{controls}
 		muted
 		autoplay
-        loop
-	></mux-video>
+		loop
+	/>
 </div>

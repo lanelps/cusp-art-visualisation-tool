@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import moment from 'moment-timezone';
 	// import YouTubePlayer from '$lib/components/YouTubePlayer.svelte';
-	// import MuxVideo from '$lib/components/MuxVideo.svelte';
+	import MuxVideo from '$lib/components/MuxVideo.svelte';
 
 	import { getTimeOfDay } from '$lib/utils/helpers';
 
@@ -129,10 +129,11 @@
 </script>
 
 <!-- <YouTubePlayer /> -->
-<!-- <MuxVideo
-	playbackId="01wESwLxbelt01vYMQ01xxKoiKQQVacEvU02WE8se8dYG3g"
+<MuxVideo
+	playbackId="TLBmOhOFtebAXIgu00Z3vjzeMp77oQ0102kNks52QgEu78"
 	metaData={{ videoTitle: 'Lyttelton Weather' }}
-/> -->
+/>
+
 <div class="absolute w-screen h-screen overflow-hidden pointer-events-none aspect-video">
 	<img
 		src={activePhase?.bg}
