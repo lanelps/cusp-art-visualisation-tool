@@ -2,7 +2,8 @@
 	import type { Data, Phases, TimeOfDay } from '$lib/types';
 	import { onMount } from 'svelte';
 	import moment from 'moment-timezone';
-	// import YouTubePlayer from '$lib/components/YouTubePlayer.svelte';
+	// import { createNoise2D } from 'simplex-noise';
+
 	import MuxVideo from '$lib/components/MuxVideo.svelte';
 
 	import { getTimeOfDay } from '$lib/utils/helpers';
@@ -88,45 +89,59 @@
 	$: cloudOpacity = mapValue(cloud, MAX_VALUES.CLOUD_COVERAGE, 1);
 	$: waveHeightTransform = mapValue(wave, MAX_VALUES.WAVE_HEIGHT, 100) * 0.1;
 
-	$: windSpeedTransform = 0;
+	// $: windSpeedTransform = 0;
 	$: windDirectionTransform = 0;
 
 	let birds: HTMLElement | null = null;
-	let time = 0;
-	let prevX = 0;
-	let prevY = 0;
-
-	const lerp = (start: number, end: number, factor: number) => start + (end - start) * factor;
+	// let time = 0;
+	// let prevX = 0;
+	// let prevY = 0;
 
 	// Reactive statements to update windSpeedTransform and windDirectionTransform when state changes
 	$: {
-		windSpeedTransform = mapValue(wind, MAX_VALUES.WIND_SPEED, 100) * 0.001;
+		// windSpeedTransform = mapValue(wind, MAX_VALUES.WIND_SPEED, 100) * 0.001;
 		windDirectionTransform = direction;
 	}
 
+	// const lerp = (start: number, end: number, factor: number) => start + (end - start) * factor;
+
+	// const noise2D = createNoise2D();
+
+	let angle = 0;
+
+	// const animate = () => {
+	// 	if (!birds || timeOfDay === 'night') return;
+
+	// 	let scale = 100 * windSpeedTransform * 50;
+	// 	let speed = windSpeedTransform;
+
+	// 	time += speed;
+
+	// 	// Use 2D noise for x and y
+	// 	let noiseX = noise2D(time, 0) - 0.5;
+	// 	let noiseY = noise2D(time, 1) - 0.5;
+
+	// 	// Calculate the new x and y positions based on the noise and the angle
+	// 	let x = scale * (noiseX * Math.cos(angle) - noiseY * Math.sin(angle)) + window.innerWidth / 2;
+	// 	let y = scale * (noiseX * Math.sin(angle) + noiseY * Math.cos(angle)) + window.innerHeight / 2;
+
+	// 	// Adjust x and y to ensure they are within the viewport
+	// 	x = Math.max(0, Math.min(window.innerWidth, x));
+	// 	y = Math.max(0, Math.min(window.innerHeight, y));
+
+	// 	let lerpX = lerp(prevX, x, speed);
+	// 	let lerpY = lerp(prevY, y, speed);
+
+	// 	birds.style.transform = `translate(calc(-50% + ${lerpX}px), calc(-50% + ${lerpY}px))`;
+
+	// 	prevX = lerpX;
+	// 	prevY = lerpY;
+
+	// 	requestAnimationFrame(animate);
+	// };
+
 	onMount(() => {
-		const animate = () => {
-			if (!birds || timeOfDay === 'night') return;
-
-			let scale = 100 * windSpeedTransform * 50;
-			let speed = windSpeedTransform;
-			let lerpFactor = windSpeedTransform;
-
-			time += speed;
-			let x = (scale * Math.cos(time)) / (1 + Math.pow(Math.sin(time), 2));
-			let y = (scale * Math.cos(time) * Math.sin(time)) / (1 + Math.pow(Math.sin(time), 2));
-
-			let lerpX = lerp(prevX, x, lerpFactor);
-			let lerpY = lerp(prevY, y, lerpFactor);
-
-			birds.style.transform = `translate(calc(-50% + ${lerpX}px), calc(-50% + ${lerpY}px))`;
-
-			prevX = lerpX;
-			prevY = lerpY;
-
-			requestAnimationFrame(animate);
-		};
-		animate();
+		// animate();
 
 		updateTimeOfDay();
 
@@ -135,12 +150,21 @@
 		return () => clearInterval(intervalId);
 	});
 
-	// Reactive statement to update position when state changes
 	$: if (birds && timeOfDay !== 'night') {
-		let angle = (windDirectionTransform * Math.PI) / 180;
-		let originX = `${50 + 50 * Math.sin(angle)}%`;
-		let originY = `${50 - 50 * Math.cos(angle)}%`;
+		// Calculate the angle based on the wind direction
+		angle = (windDirectionTransform * Math.PI) / 180;
 
+		// Calculate the origin of the birds element as a percentage of the remaining space in the viewport
+		let originXPercentage =
+			50 + Math.sin(angle) * (50 - (birds.offsetWidth / window.innerWidth) * 50);
+		let originYPercentage =
+			50 - Math.cos(angle) * (50 - (birds.offsetHeight / window.innerHeight) * 50);
+
+		// Convert percentage to pixels and adjust for the size of the birds element
+		let originX = `calc(${originXPercentage}% - ${birds.offsetWidth / 2}px)`;
+		let originY = `calc(${originYPercentage}% - ${birds.offsetHeight / 2}px)`;
+
+		// Update the position of the birds element
 		birds.style.left = originX;
 		birds.style.top = originY;
 	}
@@ -192,7 +216,7 @@
 			bind:this={birds}
 			src={lytBirds}
 			alt="Birds"
-			class="absolute w-[25vw] h-auto pointer-events-none object-cover"
+			class="absolute w-[25vw] h-auto pointer-events-none object-cover origin-center"
 			class:opacity-50={timeOfDay === 'sunset'}
 		/>
 	{/if}
