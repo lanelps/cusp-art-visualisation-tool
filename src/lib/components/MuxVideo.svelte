@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, createEventDispatcher } from 'svelte';
 	import '@mux/mux-player';
+	import type MuxPlayerElement from '@mux/mux-player';
 
 	interface MetaData {
 		videoTitle?: string;
@@ -14,7 +15,7 @@
 	export let autoplay = false;
 	export let loop = false;
 
-	let player;
+	let player: MuxPlayerElement | undefined;
 	const dispatch = createEventDispatcher();
 
 	export const play = () => {
