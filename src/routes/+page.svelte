@@ -106,7 +106,7 @@
 
 	onMount(() => {
 		const animate = () => {
-			if (!birds) return;
+			if (!birds || timeOfDay === 'night') return;
 
 			let scale = 100 * windSpeedTransform * 50;
 			let speed = windSpeedTransform;
@@ -136,7 +136,7 @@
 	});
 
 	// Reactive statement to update position when state changes
-	$: if (birds) {
+	$: if (birds && timeOfDay !== 'night') {
 		let angle = (windDirectionTransform * Math.PI) / 180;
 		let originX = `${50 + 50 * Math.sin(angle)}%`;
 		let originY = `${50 - 50 * Math.cos(angle)}%`;
@@ -187,12 +187,15 @@
 		/>
 	{/if}
 
-	<img
-		bind:this={birds}
-		src={lytBirds}
-		alt="Birds"
-		class="absolute w-[25vw] h-auto pointer-events-none object-cover"
-	/>
+	{#if lytBirds && timeOfDay !== 'night'}
+		<img
+			bind:this={birds}
+			src={lytBirds}
+			alt="Birds"
+			class="absolute w-[25vw] h-auto pointer-events-none object-cover"
+			class:opacity-50={timeOfDay === 'sunset'}
+		/>
+	{/if}
 </div>
 
 <div
