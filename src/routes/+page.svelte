@@ -2,7 +2,7 @@
 	import type { Data, Phases, TimeOfDay } from '$lib/types';
 	import { onMount } from 'svelte';
 	import moment from 'moment-timezone';
-	// import { createNoise2D } from 'simplex-noise';
+	import { createNoise2D } from 'simplex-noise';
 
 	import MuxVideo from '$lib/components/MuxVideo.svelte';
 
@@ -89,59 +89,103 @@
 	$: cloudOpacity = mapValue(cloud, MAX_VALUES.CLOUD_COVERAGE, 1);
 	$: waveHeightTransform = mapValue(wave, MAX_VALUES.WAVE_HEIGHT, 100) * 0.1;
 
-	// $: windSpeedTransform = 0;
+	$: windSpeedTransform = 0;
 	$: windDirectionTransform = 0;
 
+	let birdContainer: HTMLElement | null = null;
+	let birdWrapper: HTMLElement | null = null;
 	let birds: HTMLElement | null = null;
-	// let time = 0;
-	// let prevX = 0;
-	// let prevY = 0;
+	let time = 0;
+	let prevX = 0;
+	let prevY = 0;
 
 	// Reactive statements to update windSpeedTransform and windDirectionTransform when state changes
 	$: {
-		// windSpeedTransform = mapValue(wind, MAX_VALUES.WIND_SPEED, 100) * 0.001;
+		windSpeedTransform = mapValue(wind, MAX_VALUES.WIND_SPEED, 100) * 0.001;
 		windDirectionTransform = direction;
 	}
 
-	// const lerp = (start: number, end: number, factor: number) => start + (end - start) * factor;
+	const lerp = (start: number, end: number, factor: number) => start + (end - start) * factor;
+	const noise2D = createNoise2D();
 
-	// const noise2D = createNoise2D();
+	const map = (
+		value: number,
+		sourceRangeLow: number,
+		sourceRangeHigh: number,
+		targetRangeLow: number,
+		targetRangeHigh: number
+	): number => {
+		return (
+			targetRangeLow +
+			((targetRangeHigh - targetRangeLow) * (value - sourceRangeLow)) /
+				(sourceRangeHigh - sourceRangeLow)
+		);
+	};
 
-	let angle = 0;
+	const animateBirdWrapper = () => {
+		if (!birdWrapper || timeOfDay === 'night') return;
 
-	// const animate = () => {
-	// 	if (!birds || timeOfDay === 'night') return;
+		let speed = windSpeedTransform;
 
-	// 	let scale = 100 * windSpeedTransform * 50;
-	// 	let speed = windSpeedTransform;
+		// Map the speed to a new range
+		const scaledWindSpeed = map(speed, 0, 0.1, 1, 10);
 
-	// 	time += speed;
+		// Adjust the scale based on the wind speed using a power function
+		// Increase the base scale to make the figure 8 pattern larger at slower wind speeds
+		const baseScale = 100;
+		const scale = baseScale * Math.pow(scaledWindSpeed, 0.5);
 
-	// 	// Use 2D noise for x and y
-	// 	let noiseX = noise2D(time, 0) - 0.5;
-	// 	let noiseY = noise2D(time, 1) - 0.5;
+		// Calculate the new x and y positions based on the figure 8 pattern
+		let x = (scale * Math.cos(time)) / (1 + Math.pow(Math.sin(time), 2));
+		let y = (scale * Math.sin(time) * Math.cos(time)) / (1 + Math.pow(Math.sin(time), 2));
 
-	// 	// Calculate the new x and y positions based on the noise and the angle
-	// 	let x = scale * (noiseX * Math.cos(angle) - noiseY * Math.sin(angle)) + window.innerWidth / 2;
-	// 	let y = scale * (noiseX * Math.sin(angle) + noiseY * Math.cos(angle)) + window.innerHeight / 2;
+		// Use a logarithmic function to calculate the speed of movement
+		// This will make it increase more slowly as the windSpeedTransform increases
+		speed = Math.log(speed + 1);
 
-	// 	// Adjust x and y to ensure they are within the viewport
-	// 	x = Math.max(0, Math.min(window.innerWidth, x));
-	// 	y = Math.max(0, Math.min(window.innerHeight, y));
+		let lerpX = lerp(prevX, x, speed);
+		let lerpY = lerp(prevY, y, speed);
 
-	// 	let lerpX = lerp(prevX, x, speed);
-	// 	let lerpY = lerp(prevY, y, speed);
+		birdWrapper.style.transform = `translate(${lerpX}px, ${lerpY}px)`;
 
-	// 	birds.style.transform = `translate(calc(-50% + ${lerpX}px), calc(-50% + ${lerpY}px))`;
+		prevX = lerpX;
+		prevY = lerpY;
+	};
 
-	// 	prevX = lerpX;
-	// 	prevY = lerpY;
+	const animateBirds = () => {
+		if (!birds || timeOfDay === 'night') return;
 
-	// 	requestAnimationFrame(animate);
-	// };
+		let speed = windSpeedTransform;
+
+		time += speed;
+
+		// Calculate random movement within a range of 50px
+		const range = 100;
+		let randomX = map(noise2D(time, 1), -1, 1, 0, range); // Random value between 0 and 50
+		let randomY = map(noise2D(time, 0), -1, 1, 0, range); // Random value between 0 and 50
+
+		let lerpX = lerp(prevX, randomX, speed);
+		let lerpY = lerp(prevY, randomY, speed);
+
+		// Ensure that the birds never go further than 100 pixels on the x or y axis
+		const maxDistance = 100;
+		lerpX = Math.min(Math.max(lerpX, -maxDistance), maxDistance);
+		lerpY = Math.min(Math.max(lerpY, -maxDistance), maxDistance);
+
+		birds.style.transform = `translate(${lerpX}px, ${lerpY}px)`;
+
+		prevX = lerpX;
+		prevY = lerpY;
+	};
+
+	const animate = () => {
+		animateBirds();
+		animateBirdWrapper();
+		requestAnimationFrame(animate);
+	};
 
 	onMount(() => {
-		// animate();
+		animate();
 
 		updateTimeOfDay();
 
@@ -150,23 +194,23 @@
 		return () => clearInterval(intervalId);
 	});
 
-	$: if (birds && timeOfDay !== 'night') {
+	$: if (birdContainer && timeOfDay !== 'night') {
 		// Calculate the angle based on the wind direction
-		angle = (windDirectionTransform * Math.PI) / 180;
+		let angle = (windDirectionTransform * Math.PI) / 180;
 
-		// Calculate the origin of the birds element as a percentage of the remaining space in the viewport
+		// Calculate the origin of the birdContainer element as a percentage of the remaining space in the viewport
 		let originXPercentage =
-			50 + Math.sin(angle) * (50 - (birds.offsetWidth / window.innerWidth) * 50);
+			50 + Math.sin(angle) * (50 - (birdContainer.offsetWidth / window.innerWidth) * 50);
 		let originYPercentage =
-			50 - Math.cos(angle) * (50 - (birds.offsetHeight / window.innerHeight) * 50);
+			50 - Math.cos(angle) * (50 - (birdContainer.offsetHeight / window.innerHeight) * 50);
 
-		// Convert percentage to pixels and adjust for the size of the birds element
-		let originX = `calc(${originXPercentage}% - ${birds.offsetWidth / 2}px)`;
-		let originY = `calc(${originYPercentage}% - ${birds.offsetHeight / 2}px)`;
+		// Convert percentage to pixels and adjust for the size of the birdContainer element
+		let originX = `calc(${originXPercentage}% - ${birdContainer.offsetWidth / 2}px)`;
+		let originY = `calc(${originYPercentage}% - ${birdContainer.offsetHeight / 2}px)`;
 
-		// Update the position of the birds element
-		birds.style.left = originX;
-		birds.style.top = originY;
+		// Update the position of the birdContainer element
+		birdContainer.style.left = originX;
+		birdContainer.style.top = originY;
 	}
 </script>
 
@@ -212,17 +256,24 @@
 	{/if}
 
 	{#if lytBirds && timeOfDay !== 'night'}
-		<img
-			bind:this={birds}
-			src={lytBirds}
-			alt="Birds"
-			class="absolute w-[25vw] h-auto pointer-events-none object-cover origin-center"
-			class:opacity-50={timeOfDay === 'sunset'}
-		/>
+		<div
+			bind:this={birdContainer}
+			class="absolute w-[25vw] h-auto pointer-events-none origin-center"
+		>
+			<div bind:this={birdWrapper}>
+				<img
+					bind:this={birds}
+					src={lytBirds}
+					alt="Birds"
+					class="object-contain w-full h-full"
+					class:brightness-75={timeOfDay === 'sunset'}
+				/>
+			</div>
+		</div>
 	{/if}
 </div>
 
-<div
+<!-- <div
 	class="absolute w-screen h-screen overflow-hidden transition-opacity duration-1000 opacity-0 pointer-events-none aspect-video"
 	class:opacity-100={showVideo}
 >
@@ -233,7 +284,7 @@
 		autoplay={showVideo}
 		on:ended={() => (showVideo = false)}
 	/>
-</div>
+</div> -->
 
 <section
 	class="relative z-10 w-[343px] text-white bg-black top-4 left-4 hover:opacity-100 transition-opacity"
