@@ -4,7 +4,7 @@
 	import moment from 'moment-timezone';
 	import { createNoise2D } from 'simplex-noise';
 
-	import MuxVideo from '$lib/components/MuxVideo.svelte';
+	// import MuxVideo from '$lib/components/MuxVideo.svelte';
 
 	import { getTimeOfDay } from '$lib/utils/helpers';
 
@@ -96,8 +96,6 @@
 	let birdWrapper: HTMLElement | null = null;
 	let birds: HTMLElement | null = null;
 	let time = 0;
-	let prevX = 0;
-	let prevY = 0;
 
 	// Reactive statements to update windSpeedTransform and windDirectionTransform when state changes
 	$: {
@@ -105,7 +103,6 @@
 		windDirectionTransform = direction;
 	}
 
-	const lerp = (start: number, end: number, factor: number) => start + (end - start) * factor;
 	const noise2D = createNoise2D();
 
 	const map = (
@@ -125,60 +122,40 @@
 	const animateBirdWrapper = () => {
 		if (!birdWrapper || timeOfDay === 'night') return;
 
-		let speed = windSpeedTransform;
+		// Map the wind speed to a new range
+		const scaledWindSpeed = map(windSpeedTransform, 0, 0.1, 1, 12.5);
 
-		// Map the speed to a new range
-		const scaledWindSpeed = map(speed, 0, 0.1, 1, 10);
+		// Adjust the scale based on the wind speed using a linear function
+		const scale = 50 * scaledWindSpeed;
 
-		// Adjust the scale based on the wind speed using a power function
-		// Increase the base scale to make the figure 8 pattern larger at slower wind speeds
-		const baseScale = 100;
-		const scale = baseScale * Math.pow(scaledWindSpeed, 0.5);
-
-		// Calculate the new x and y positions based on the figure 8 pattern
+		// Calculate the new x and y positions based on the lemniscate of Bernoulli
 		let x = (scale * Math.cos(time)) / (1 + Math.pow(Math.sin(time), 2));
 		let y = (scale * Math.sin(time) * Math.cos(time)) / (1 + Math.pow(Math.sin(time), 2));
 
-		// Use a logarithmic function to calculate the speed of movement
-		// This will make it increase more slowly as the windSpeedTransform increases
-		speed = Math.log(speed + 1);
-
-		let lerpX = lerp(prevX, x, speed);
-		let lerpY = lerp(prevY, y, speed);
-
-		birdWrapper.style.transform = `translate(${lerpX}px, ${lerpY}px)`;
-
-		prevX = lerpX;
-		prevY = lerpY;
+		birdWrapper.style.transform = `translate(${x}px, ${y}px)`;
 	};
 
 	const animateBirds = () => {
 		if (!birds || timeOfDay === 'night') return;
 
-		let speed = windSpeedTransform;
+		// Increase the scale of the Perlin noise more rapidly at lower wind speeds
+		const noiseScale = map(Math.sqrt(windSpeedTransform), 0, Math.sqrt(0.1), 0, 1);
 
-		time += speed;
-
-		// Calculate random movement within a range of 50px
-		const range = 100;
-		let randomX = map(noise2D(time, 1), -1, 1, 0, range); // Random value between 0 and 50
-		let randomY = map(noise2D(time, 0), -1, 1, 0, range); // Random value between 0 and 50
-
-		let lerpX = lerp(prevX, randomX, speed);
-		let lerpY = lerp(prevY, randomY, speed);
+		// Calculate random movement within a range
+		const range = 50;
+		let randomX = map(noise2D(time * noiseScale, 1), -1, 1, -range, range); // Random value between -range and range
+		let randomY = map(noise2D(time * noiseScale, 0), -1, 1, -range, range); // Random value between -range and range
 
 		// Ensure that the birds never go further than 100 pixels on the x or y axis
 		const maxDistance = 100;
-		lerpX = Math.min(Math.max(lerpX, -maxDistance), maxDistance);
-		lerpY = Math.min(Math.max(lerpY, -maxDistance), maxDistance);
+		randomX = Math.min(Math.max(randomX, -maxDistance), maxDistance);
+		randomY = Math.min(Math.max(randomY, -maxDistance), maxDistance);
 
-		birds.style.transform = `translate(${lerpX}px, ${lerpY}px)`;
-
-		prevX = lerpX;
-		prevY = lerpY;
+		birds.style.transform = `translate(${randomX}px, ${randomY}px)`;
 	};
 
 	const animate = () => {
+		time += 0.01;
 		animateBirds();
 		animateBirdWrapper();
 		requestAnimationFrame(animate);
