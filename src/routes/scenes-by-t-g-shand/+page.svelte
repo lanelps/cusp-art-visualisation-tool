@@ -1,8 +1,11 @@
 <script lang="ts">
-	import type { Data, Phases, TimeOfDay } from '$lib/types';
+	import type { Data, Phases, Phase, TimeOfDay } from '$lib/types';
 	import { onMount } from 'svelte';
+	import { fade } from 'svelte/transition';
 	import moment from 'moment-timezone';
 	import { createNoise2D } from 'simplex-noise';
+
+	import type MuxPlayerElement from '@mux/mux-player';
 
 	// import MuxVideo from '$lib/components/MuxVideo.svelte';
 
@@ -22,7 +25,7 @@
 
 	import lytBirds from '$lib/assets/lyt-birds.gif';
 	import lytBoat from '$lib/assets/lyt-boat.gif';
-	import ltyLights from '$lib/assets/lyt-lights.gif';
+	import lytLights from '$lib/assets/lyt-lights.gif';
 
 	import cuspLogo from '$lib/assets/cusp-logo-white.png';
 
@@ -41,17 +44,47 @@
 	};
 
 	const phases: Phases = {
-		day: { bg: lytDayBG, cloud: lytDayCloud, waves: lytDayWaves, boat: lytBoat },
-		sunset: { bg: lytSunsetBG, cloud: lytSunsetCloud, waves: lytSunsetWaves, lights: ltyLights },
-		night: { bg: lytNightBG, cloud: lytNightCloud, waves: lytNightWaves, lights: ltyLights }
+		day: { bg: lytDayBG, cloud: lytDayCloud, waves: lytDayWaves },
+		sunset: {
+			bg: lytSunsetBG,
+			cloud: lytSunsetCloud,
+			waves: lytSunsetWaves
+		},
+		night: { bg: lytNightBG, cloud: lytNightCloud, waves: lytNightWaves }
 	};
 
-	let timeOfDay: TimeOfDay = data.timeOfDay;
-	$: activePhase = timeOfDay ? phases[timeOfDay] : undefined;
+	let timeOfDay: TimeOfDay = data.timeOfDay || 'day';
+	let previousTimeOfDay: TimeOfDay;
+	let transitionAssets = false;
+	let activePhase = phases[timeOfDay];
+
+	let timeOfDayValues = ['day', 'sunset', 'night'];
+	let nextPhase: Phase;
+
+	$: {
+		if (timeOfDay !== undefined) {
+			let currentIndex = timeOfDayValues.indexOf(timeOfDay);
+			let nextTimeOfDay = timeOfDayValues[currentIndex];
+			nextPhase = phases[nextTimeOfDay];
+		}
+	}
+
+	$: {
+		if (timeOfDay && timeOfDay !== previousTimeOfDay) {
+			transitionAssets = true;
+
+			setTimeout(() => {
+				transitionAssets = false;
+				activePhase = phases[timeOfDay];
+				previousTimeOfDay = timeOfDay;
+			}, 5000);
+		}
+	}
+
 	let manualOverride = false;
 	let timeString = moment().tz('Pacific/Auckland').format('HH:mm:ss');
 
-	let muxVideo;
+	let muxVideo: MuxPlayerElement | undefined;
 	let showVideo = false;
 
 	// Reactive statement to update showVideo when timeOfDay changes
@@ -77,17 +110,19 @@
 	const updateTimeOfDay = () => {
 		timeString = moment().tz('Pacific/Auckland').format('HH:mm:ss');
 
-		if (manualOverride) {
-			return;
-		}
+		if (manualOverride) return;
 
-		timeOfDay = getTimeOfDay();
-		activePhase = phases[timeOfDay];
+		const newTimeOfDay = getTimeOfDay();
+		if (newTimeOfDay === timeOfDay) return;
+
+		timeOfDay = newTimeOfDay;
+		// nextPhase = phases[timeOfDay];
 	};
 
 	const handleSelectChange = () => {
 		manualOverride = true;
 	};
+
 	$: cloudOpacity = mapValue(cloud, MAX_VALUES.CLOUD_COVERAGE, 1);
 	$: waveHeightTransform = mapValue(wave, MAX_VALUES.WAVE_HEIGHT, 100) * 0.1;
 
@@ -194,43 +229,92 @@
 </script>
 
 <div class="absolute w-screen h-screen overflow-hidden pointer-events-none aspect-video">
-	<img
-		src={activePhase?.bg}
-		alt="Lyttelton Background"
-		class="absolute top-0 left-0 object-cover w-full h-full"
-	/>/
+	<div class="absolute top-0 left-0 w-full h-full">
+		<img src={activePhase?.bg} alt="Lyttelton Background" class="object-cover w-full h-full" />
+		{#if transitionAssets}
+			<img
+				src={nextPhase?.bg}
+				alt="Lyttelton Background"
+				class="absolute top-0 left-0 object-cover w-full h-full"
+				in:fade={{ duration: 5000 }}
+			/>
+		{/if}
+	</div>
+
 	<div style="--wave-height: {waveHeightTransform}%;" class="absolute top-0 left-0 w-full h-full">
 		<img
 			src={activePhase?.waves}
 			alt="Lyttelton Waves"
-			class="absolute object-cover w-full h-full"
+			class="absolute object-cover w-full h-full transition-opacity opacity-0"
+			class:duration-[5000ms]={transitionAssets}
+			class:duration-[0ms]={!transitionAssets}
+			class:opacity-100={!transitionAssets}
 		/>
 		<img
 			src={activePhase?.waves}
 			alt="Lyttelton Waves"
-			class="absolute object-cover w-full h-full wave"
+			class="absolute object-cover w-full h-full transition-opacity opacity-0 wave"
+			class:duration-[5000ms]={transitionAssets}
+			class:duration-[0ms]={!transitionAssets}
+			class:opacity-100={!transitionAssets}
 		/>
-	</div>
-	<img
-		src={activePhase?.cloud}
-		alt="Lyttelton Cloud"
-		style="--opacity: {cloudOpacity};"
-		class="absolute w-full h-full opacity-[var(--opacity)] top-0 left-0 object-cover"
-	/>
 
-	{#if activePhase?.lights}
+		{#if transitionAssets}
+			<img
+				src={nextPhase?.waves}
+				alt="Lyttelton Waves"
+				class="absolute object-cover w-full h-full"
+				in:fade={{ duration: 5000 }}
+			/>
+			<img
+				src={nextPhase?.waves}
+				alt="Lyttelton Waves"
+				class="absolute object-cover w-full h-full wave"
+				in:fade={{ duration: 5000 }}
+			/>
+		{/if}
+	</div>
+
+	<div
+		style="--opacity: {cloudOpacity};"
+		class="absolute w-full h-full opacity-[var(--opacity)] top-0 left-0"
+	>
 		<img
-			src={activePhase.lights}
+			id="activeCloud"
+			src={activePhase.cloud}
+			alt="Lyttelton Cloud"
+			class="object-cover w-full h-full transition-opacity opacity-0"
+			class:duration-[5000ms]={transitionAssets}
+			class:duration-[0ms]={!transitionAssets}
+			class:opacity-100={!transitionAssets}
+		/>
+
+		{#if transitionAssets}
+			<img
+				id="nextCloud"
+				src={nextPhase.cloud}
+				alt="Lyttelton Cloud"
+				class="absolute top-0 left-0 object-cover w-full h-full"
+				in:fade={{ duration: 5000 }}
+			/>
+		{/if}
+	</div>
+
+	{#if lytLights && timeOfDay !== 'day'}
+		<img
+			src={lytLights}
 			alt="Lyttelton Lights"
 			class="absolute top-0 left-0 object-cover w-full h-full"
+			transition:fade={{ duration: 5000 }}
 		/>
 	{/if}
 
-	{#if activePhase?.boat}
+	{#if lytBoat && timeOfDay === 'day'}
 		<img
-			src={activePhase.boat}
+			src={lytBoat}
 			alt="Lyttelton Boat"
 			class="absolute top-0 left-0 object-cover w-full h-full"
+			transition:fade={{ duration: 5000 }}
 		/>
 	{/if}
 
@@ -238,6 +322,7 @@
 		<div
 			bind:this={birdContainer}
 			class="absolute w-[25vw] h-auto pointer-events-none origin-center"
+			transition:fade={{ duration: 5000 }}
 		>
 			<div bind:this={birdWrapper}>
 				<img
@@ -343,7 +428,7 @@
 	</div>
 </section>
 
-<img src={cuspLogo} alt="CUSP Logo" class="absolute w-32 h-auto bottom-4 right-4 object-contain" />
+<img src={cuspLogo} alt="CUSP Logo" class="absolute object-contain w-32 h-auto bottom-4 right-4" />
 
 <style>
 	@keyframes waveHeightAnimation {

@@ -17,18 +17,18 @@ export type TimeOfDay = 'day' | 'sunset' | 'night' | undefined;
 
 export type Data = {
 	weather: Weather;
-	timeOfDay?: TimeOfDay;
+	timeOfDay: TimeOfDay;
 };
 
 export type Phase = {
 	bg: string;
 	cloud: string;
 	waves: string;
-	boat?: string;
 	lights?: string;
 };
 
 export type Phases = {
+	[key: string]: Phase;
 	day: Phase;
 	sunset: Phase;
 	night: Phase;
