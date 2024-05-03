@@ -24,6 +24,8 @@
 	import lytBoat from '$lib/assets/lyt-boat.gif';
 	import ltyLights from '$lib/assets/lyt-lights.gif';
 
+	import cuspLogo from '$lib/assets/cusp-logo-white.png';
+
 	export let data: Data;
 
 	let { cloud: cloudStr, wave: waveObj, wind: windObj } = data.weather;
@@ -340,6 +342,8 @@
 		</div>
 	</div>
 </section>
+
+<img src={cuspLogo} alt="CUSP Logo" class="absolute w-32 h-auto bottom-4 right-4 object-contain" />
 
 <style>
 	@keyframes waveHeightAnimation {
