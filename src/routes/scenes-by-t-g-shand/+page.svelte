@@ -428,7 +428,9 @@
 	</div>
 </section> -->
 
-<img src={cuspLogo} alt="CUSP Logo" class="absolute object-contain w-32 h-auto bottom-4 right-4" />
+<a href="https://www.cusp-studio.co/art-studio" target="_blank" class="absolute bottom-4 right-4">
+	<img src={cuspLogo} alt="CUSP Logo" class="object-contain w-32 h-auto" />
+</a>
 
 <style>
 	@keyframes waveHeightAnimation {
