@@ -6,8 +6,7 @@
 	import { createNoise2D } from 'simplex-noise';
 
 	import type MuxPlayerElement from '@mux/mux-player';
-
-	// import MuxVideo from '$lib/components/MuxVideo.svelte';
+	import MuxVideo from '$lib/components/MuxVideo.svelte';
 
 	import { getTimeOfDay } from '$lib/utils/helpers';
 
@@ -337,18 +336,18 @@
 	{/if}
 </div>
 
-<!-- <div
+<div
 	class="absolute w-screen h-screen overflow-hidden transition-opacity duration-1000 opacity-0 pointer-events-none aspect-video"
 	class:opacity-100={showVideo}
 >
 	<MuxVideo
 		bind:this={muxVideo}
-		playbackId="TLBmOhOFtebAXIgu00Z3vjzeMp77oQ0102kNks52QgEu78"
-		metaData={{ videoTitle: 'Lyttelton Weather' }}
+		playbackId="pZw8Xu5zHfBWZZ1hPKtNM3Nm7LTDHPETrDT7MKO0001zE"
+		metaData={{ videoTitle: 'T.G Shand Scenes Offical Music Video' }}
 		autoplay={showVideo}
 		on:ended={() => (showVideo = false)}
 	/>
-</div> -->
+</div>
 
 <!-- <section
 	class="relative z-10 w-[343px] text-white bg-black top-4 left-4 hover:opacity-100 transition-opacity"
