@@ -228,7 +228,7 @@
 	}
 </script>
 
-<div class="absolute w-screen h-screen overflow-hidden pointer-events-none aspect-video">
+<div class="absolute w-screen h-screen overflow-hidden aspect-video">
 	<div class="absolute top-0 left-0 w-full h-full">
 		<img src={activePhase?.bg} alt="Lyttelton Background" class="object-cover w-full h-full" />
 		{#if transitionAssets}
@@ -356,9 +356,14 @@
 	<a
 		href="https://www.cusp-studio.co/scenes-by-t-g-shand"
 		target="_blank"
-		class="absolute pointer-events-auto bottom-4 right-4"
+		class="absolute bottom-4 right-4"
 	>
-		<img src={scenesLogo} alt="Scenes by T.G Shand" class="object-contain w-40 h-auto" />
+		<img
+			src={scenesLogo}
+			alt="Scenes by T.G Shand"
+			class="object-contain w-40 h-auto"
+			class:pointer-events-auto={showVideo}
+		/>
 	</a>
 </div>
 
