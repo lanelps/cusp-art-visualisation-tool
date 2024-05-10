@@ -11,7 +11,7 @@
 	export let playbackId: string;
 	export let metaData: MetaData | undefined;
 	export let controls = false;
-	export let muted = false;
+	export let muted = true;
 	export let autoplay = false;
 	export let loop = false;
 
@@ -19,7 +19,8 @@
 	const dispatch = createEventDispatcher();
 
 	export const play = () => {
-		player?.media?.nativeEl.play();
+		player.media.nativeEl.play();
+		player.media.nativeEl.muted = false;
 	};
 
 	export const pause = () => {

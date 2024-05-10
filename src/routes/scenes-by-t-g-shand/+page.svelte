@@ -54,6 +54,7 @@
 	};
 
 	let timeOfDay: TimeOfDay = data.timeOfDay || 'day';
+
 	let previousTimeOfDay: TimeOfDay;
 	let transitionAssets = false;
 	let activePhase = phases[timeOfDay];
@@ -86,6 +87,7 @@
 
 	let muxVideo: MuxPlayerElement | undefined;
 	let showVideo = false;
+	let videoPlaying = false;
 
 	// Reactive statement to update showVideo when timeOfDay changes
 	$: {
@@ -94,9 +96,7 @@
 
 	$: {
 		if (muxVideo) {
-			if (showVideo) {
-				muxVideo?.play();
-			} else {
+			if (!showVideo) {
 				muxVideo?.pause();
 			}
 		}
@@ -345,9 +345,18 @@
 		bind:this={muxVideo}
 		playbackId="pZw8Xu5zHfBWZZ1hPKtNM3Nm7LTDHPETrDT7MKO0001zE"
 		metaData={{ videoTitle: 'T.G Shand Scenes Offical Music Video' }}
-		autoplay={showVideo}
 		on:ended={() => (showVideo = false)}
 	/>
+	<button
+		on:click={() => {
+			muxVideo?.play();
+			videoPlaying = true;
+			// muxVideo?.toggleMute();
+		}}
+		class="absolute text-white transition-opacity -translate-x-1/2 -translate-y-1/2 opacity-0 pointer-events-none top-1/2 left-1/2"
+		class:!opacity-100={showVideo && !videoPlaying}
+		class:!pointer-events-auto={showVideo && !videoPlaying}>Play Video</button
+	>
 </div>
 
 <!-- <section
