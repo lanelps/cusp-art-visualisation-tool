@@ -335,10 +335,6 @@
 			</div>
 		</div>
 	{/if}
-
-	<a href="https://www.cusp-studio.co/art-studio" target="_blank" class="absolute bottom-4 right-4">
-		<img src={cuspLogo} alt="CUSP Logo" class="object-contain w-32 h-auto" />
-	</a>
 </div>
 
 <div
@@ -352,19 +348,6 @@
 		autoplay={showVideo}
 		on:ended={() => (showVideo = false)}
 	/>
-
-	<a
-		href="https://www.cusp-studio.co/scenes-by-t-g-shand"
-		target="_blank"
-		class="absolute bottom-4 right-4"
-	>
-		<img
-			src={scenesLogo}
-			alt="Scenes by T.G Shand"
-			class="object-contain w-40 h-auto"
-			class:pointer-events-auto={showVideo}
-		/>
-	</a>
 </div>
 
 <!-- <section
@@ -444,6 +427,18 @@
 		</div>
 	</div>
 </section> -->
+
+<a
+	href="https://www.cusp-studio.co/scenes-by-t-g-shand"
+	target="_blank"
+	class="absolute bottom-4 left-4"
+>
+	<img src={scenesLogo} alt="Scenes by T.G Shand" class="object-contain w-40 h-auto" />
+</a>
+
+<a href="https://www.cusp-studio.co/art-studio" target="_blank" class="absolute bottom-4 right-4">
+	<img src={cuspLogo} alt="CUSP Logo" class="object-contain w-32 h-auto" />
+</a>
 
 <style>
 	@keyframes waveHeightAnimation {
