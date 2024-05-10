@@ -53,8 +53,7 @@
 		night: { bg: lytNightBG, cloud: lytNightCloud, waves: lytNightWaves }
 	};
 
-	// let timeOfDay: TimeOfDay = data.timeOfDay || 'day';
-	let timeOfDay = 'sunset';
+	let timeOfDay: TimeOfDay = data.timeOfDay || 'day';
 
 	let previousTimeOfDay: TimeOfDay;
 	let transitionAssets = false;
