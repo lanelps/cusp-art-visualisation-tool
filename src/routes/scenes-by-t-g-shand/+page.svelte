@@ -27,6 +27,7 @@
 	import lytLights from '$lib/assets/lyt-lights.gif';
 
 	import cuspLogo from '$lib/assets/cusp-logo-white.png';
+	import scenesLogo from '$lib/assets/scenes-by-t-g-shand.png';
 
 	export let data: Data;
 
@@ -334,6 +335,10 @@
 			</div>
 		</div>
 	{/if}
+
+	<a href="https://www.cusp-studio.co/art-studio" target="_blank" class="absolute bottom-4 right-4">
+		<img src={cuspLogo} alt="CUSP Logo" class="object-contain w-32 h-auto" />
+	</a>
 </div>
 
 <div
@@ -347,9 +352,17 @@
 		autoplay={showVideo}
 		on:ended={() => (showVideo = false)}
 	/>
+
+	<a
+		href="https://www.cusp-studio.co/scenes-by-t-g-shand"
+		target="_blank"
+		class="absolute pointer-events-auto bottom-4 right-4"
+	>
+		<img src={scenesLogo} alt="Scenes by T.G Shand" class="object-contain w-40 h-auto" />
+	</a>
 </div>
 
-<!-- <section
+<section
 	class="relative z-10 w-[343px] text-white bg-black top-4 left-4 hover:opacity-100 transition-opacity"
 	class:opacity-50={!infoActive}
 >
@@ -425,11 +438,7 @@
 			</div>
 		</div>
 	</div>
-</section> -->
-
-<a href="https://www.cusp-studio.co/art-studio" target="_blank" class="absolute bottom-4 right-4">
-	<img src={cuspLogo} alt="CUSP Logo" class="object-contain w-32 h-auto" />
-</a>
+</section>
 
 <style>
 	@keyframes waveHeightAnimation {
