@@ -12,7 +12,7 @@
 	export let metaData: MetaData | undefined;
 	export let controls = false;
 	export let muted = true;
-	export let autoplay = false;
+	export let autoplay = true;
 	export let loop = false;
 
 	let player: MuxPlayerElement | undefined;
@@ -20,11 +20,14 @@
 
 	export const play = () => {
 		player.media.nativeEl.play();
-		player.media.nativeEl.muted = false;
 	};
 
 	export const pause = () => {
 		player?.media?.nativeEl.pause();
+	};
+
+	export const toggleMute = () => {
+		player.media.nativeEl.muted = !player?.media?.nativeEl.muted;
 	};
 
 	const handleVideoEnded = () => {

@@ -29,6 +29,9 @@
 	import cuspLogo from '$lib/assets/cusp-logo-white.png';
 	import scenesLogo from '$lib/assets/scenes-by-t-g-shand.png';
 
+	import VolumeOn from '$lib/assets/svg/VolumeOn.svelte';
+	import VolumeOff from '$lib/assets/svg/VolumeOff.svelte';
+
 	export let data: Data;
 
 	let { cloud: cloudStr, wave: waveObj, wind: windObj } = data.weather;
@@ -87,7 +90,7 @@
 
 	let muxVideo: MuxPlayerElement | undefined;
 	let showVideo = false;
-	let videoPlaying = false;
+	let videoMuted = true;
 
 	// Reactive statement to update showVideo when timeOfDay changes
 	$: {
@@ -349,14 +352,19 @@
 	/>
 	<button
 		on:click={() => {
-			muxVideo?.play();
-			videoPlaying = true;
-			// muxVideo?.toggleMute();
+			muxVideo?.toggleMute();
+			videoMuted = !videoMuted;
 		}}
-		class="absolute text-white transition-opacity -translate-x-1/2 -translate-y-1/2 opacity-0 pointer-events-none top-1/2 left-1/2"
-		class:!opacity-100={showVideo && !videoPlaying}
-		class:!pointer-events-auto={showVideo && !videoPlaying}>Play Video</button
+		class="absolute text-white transition-opacity opacity-0 pointer-events-none top-4 right-4"
+		class:!opacity-100={showVideo}
+		class:!pointer-events-auto={showVideo}
 	>
+		{#if videoMuted}
+			<VolumeOff />
+		{:else}
+			<VolumeOn />
+		{/if}
+	</button>
 </div>
 
 <!-- <section
