@@ -11,14 +11,19 @@ export const getTimeOfDay = () => {
 
 	// Calculate sunrise and sunset times for the current day
 	const sunTimes = SunCalc.getTimes(currentDateTime, lyttleton.lat, lyttleton.lon);
+	const dawn = moment(sunTimes.dawn).tz(timezone);
 	const sunrise = moment(sunTimes.sunrise).tz(timezone);
 	const sunset = moment(sunTimes.sunset).tz(timezone);
 	const nauticalDusk = moment(sunTimes.nauticalDusk).tz(timezone);
 
 	// Compare current time with sunrise and sunset times
-	if (currentDate.isAfter(sunrise) && currentDate.isBefore(sunset)) {
+	if (currentDate.isBefore(dawn)) {
+		return 'night';
+	} else if (currentDate.isSameOrAfter(dawn) && currentDate.isBefore(sunrise)) {
+		return 'sunrise';
+	} else if (currentDate.isSameOrAfter(sunrise) && currentDate.isBefore(sunset)) {
 		return 'day';
-	} else if (currentDate.isAfter(sunset) && currentDate.isBefore(nauticalDusk)) {
+	} else if (currentDate.isSameOrAfter(sunset) && currentDate.isBefore(nauticalDusk)) {
 		return 'sunset';
 	} else {
 		return 'night';

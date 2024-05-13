@@ -13,7 +13,7 @@ export type Weather = {
 	wind: { speed: number; direction: string };
 };
 
-export type TimeOfDay = 'day' | 'sunset' | 'night' | undefined;
+export type TimeOfDay = 'sunrise' | 'day' | 'sunset' | 'night' | undefined;
 
 export type Data = {
 	weather: Weather;

@@ -26,6 +26,10 @@
 		player?.media?.nativeEl.pause();
 	};
 
+	export const reset = () => {
+		player.media.nativeEl.currentTime = 0;
+	};
+
 	export const toggleMute = () => {
 		player.media.nativeEl.muted = !player?.media?.nativeEl.muted;
 	};

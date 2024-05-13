@@ -47,6 +47,11 @@
 	};
 
 	const phases: Phases = {
+		sunrise: {
+			bg: lytSunsetBG,
+			cloud: lytSunsetCloud,
+			waves: lytSunsetWaves
+		},
 		day: { bg: lytDayBG, cloud: lytDayCloud, waves: lytDayWaves },
 		sunset: {
 			bg: lytSunsetBG,
@@ -62,7 +67,7 @@
 	let transitionAssets = false;
 	let activePhase = phases[timeOfDay];
 
-	let timeOfDayValues = ['day', 'sunset', 'night'];
+	let timeOfDayValues = ['sunrise', 'day', 'sunset', 'night'];
 	let nextPhase: Phase;
 
 	$: {
@@ -94,12 +99,15 @@
 
 	// Reactive statement to update showVideo when timeOfDay changes
 	$: {
-		showVideo = timeOfDay === 'sunset';
+		showVideo = timeOfDay === 'sunrise' || timeOfDay === 'sunset';
 	}
 
 	$: {
 		if (muxVideo) {
-			if (!showVideo) {
+			if (showVideo) {
+				muxVideo?.reset();
+				muxVideo?.play();
+			} else {
 				muxVideo?.pause();
 			}
 		}
@@ -333,7 +341,7 @@
 					src={lytBirds}
 					alt="Birds"
 					class="object-contain w-full h-full"
-					class:brightness-75={timeOfDay === 'sunset'}
+					class:brightness-75={timeOfDay === 'sunrise' || timeOfDay === 'sunset'}
 				/>
 			</div>
 		</div>
@@ -367,7 +375,7 @@
 	</button>
 </div>
 
-<!-- <section
+<section
 	class="relative z-10 w-[343px] text-white bg-black top-4 left-4 hover:opacity-100 transition-opacity"
 	class:opacity-50={!infoActive}
 >
@@ -443,7 +451,7 @@
 			</div>
 		</div>
 	</div>
-</section> -->
+</section>
 
 <a
 	href="https://www.cusp-studio.co/scenes-by-t-g-shand"
