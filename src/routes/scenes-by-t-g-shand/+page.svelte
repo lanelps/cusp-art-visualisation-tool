@@ -375,7 +375,7 @@
 	</button>
 </div>
 
-<!-- <section
+<section
 	class="relative z-10 w-[343px] text-white bg-black top-4 left-4 hover:opacity-100 transition-opacity"
 	class:opacity-50={!infoActive}
 >
@@ -451,7 +451,7 @@
 			</div>
 		</div>
 	</div>
-</section> -->
+</section>
 
 <a
 	href="https://www.cusp-studio.co/scenes-by-t-g-shand"
