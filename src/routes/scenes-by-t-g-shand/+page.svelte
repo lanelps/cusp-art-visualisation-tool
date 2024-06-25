@@ -221,6 +221,11 @@
 		requestAnimationFrame(animate);
 	};
 
+	const closeVideo = (e) => {
+		if (!showVideo && e.key !== 'Escape') return;
+		showVideo = false;
+	};
+
 	onMount(() => {
 		animate();
 
@@ -251,6 +256,7 @@
 	}
 </script>
 
+<svelte:window on:keydown={closeVideo} />
 <svelte:document on:keydown={toggleFullScreen} />
 
 <div class="absolute w-screen h-screen overflow-hidden aspect-video">
