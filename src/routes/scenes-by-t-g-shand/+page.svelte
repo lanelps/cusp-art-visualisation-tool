@@ -99,6 +99,8 @@
 	let showVideo = false;
 	let videoMuted = true;
 
+	$: showVideo ? (infoHidden = true) : (infoHidden = false);
+
 	// Reactive statement to update showVideo when timeOfDay changes
 	$: {
 		if (!$isMobile) {
@@ -118,6 +120,7 @@
 	}
 
 	let infoActive = false;
+	let infoHidden = false;
 
 	const mapValue = (value: number, max: number, factor: number) => (value / max) * factor;
 
@@ -386,6 +389,8 @@
 <section
 	class="relative z-10 w-[343px] text-white bg-black top-4 left-4 hover:opacity-100 transition-opacity"
 	class:opacity-50={!infoActive}
+	class:opacity-0={infoHidden}
+	class:pointer-events-none={infoHidden}
 >
 	<button
 		class="flex items-center justify-between w-full px-3 py-1"
