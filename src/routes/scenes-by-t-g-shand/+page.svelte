@@ -368,21 +368,39 @@
 			metaData={{ videoTitle: 'T.G Shand Scenes Offical Music Video' }}
 			on:ended={() => (showVideo = false)}
 		/>
-		<button
-			on:click={() => {
-				muxVideo?.toggleMute();
-				videoMuted = !videoMuted;
-			}}
-			class="absolute text-white transition-opacity opacity-0 pointer-events-none top-4 right-4"
-			class:!opacity-100={showVideo}
-			class:!pointer-events-auto={showVideo}
-		>
-			{#if videoMuted}
-				<VolumeOff />
-			{:else}
-				<VolumeOn />
-			{/if}
-		</button>
+		<div class="absolute flex items-center gap-x-2 top-4 right-4">
+			<button
+				on:click={() => {
+					muxVideo?.toggleMute();
+					videoMuted = !videoMuted;
+				}}
+				class="text-white transition-opacity opacity-0 pointer-events-none"
+				class:!opacity-100={showVideo}
+				class:!pointer-events-auto={showVideo}
+			>
+				{#if videoMuted}
+					<VolumeOff />
+				{:else}
+					<VolumeOn />
+				{/if}
+			</button>
+
+			<button
+				on:click={() => {
+					showVideo = false;
+				}}
+				class="relative w-8 p-2 text-white opacity-0 pointer-events-none"
+				class:!opacity-100={showVideo}
+				class:!pointer-events-auto={showVideo}
+			>
+				<div
+					class="absolute w-6 h-0.5 rotate-45 -translate-x-1/2 -translate-y-1/2 bg-white top-1/2 left-1/2"
+				/>
+				<div
+					class="absolute w-6 h-0.5 -rotate-45 -translate-x-1/2 -translate-y-1/2 bg-white top-1/2 left-1/2"
+				/>
+			</button>
+		</div>
 	</div>
 {/if}
 
