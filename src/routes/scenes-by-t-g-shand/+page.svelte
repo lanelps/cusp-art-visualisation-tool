@@ -99,7 +99,12 @@
 	let showVideo = false;
 	let videoMuted = true;
 
-	$: showVideo ? (infoHidden = true) : (infoHidden = false);
+	$: if (showVideo) {
+		infoActive = false;
+		infoHidden = true;
+	} else {
+		infoHidden = false;
+	}
 
 	// Reactive statement to update showVideo when timeOfDay changes
 	$: {
@@ -407,7 +412,7 @@
 <section
 	class="relative z-10 w-[343px] text-white bg-black top-4 left-4 hover:opacity-100 transition-opacity"
 	class:opacity-50={!infoActive}
-	class:opacity-0={infoHidden}
+	class:!opacity-0={infoHidden}
 	class:pointer-events-none={infoHidden}
 >
 	<button
