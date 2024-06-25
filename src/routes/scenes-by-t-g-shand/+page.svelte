@@ -102,7 +102,7 @@
 	// Reactive statement to update showVideo when timeOfDay changes
 	$: {
 		if (!$isMobile) {
-			showVideo = timeOfDay === 'sunrise' || timeOfDay === 'sunset';
+			showVideo = timeOfDay === 'sunset';
 		}
 	}
 
