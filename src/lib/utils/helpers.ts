@@ -29,3 +29,19 @@ export const getTimeOfDay = () => {
 		return 'night';
 	}
 };
+
+export const toggleFullScreen = (e: KeyboardEvent) => {
+	if (e.key !== 'f') return;
+
+	if (!document?.fullscreenElement) {
+		// Request full-screen
+		document.documentElement.requestFullscreen().catch((err) => {
+			console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+		});
+	} else {
+		// Exit full-screen
+		document.exitFullscreen().catch((err) => {
+			console.error(`Error attempting to disable full-screen mode: ${err.message} (${err.name})`);
+		});
+	}
+};
