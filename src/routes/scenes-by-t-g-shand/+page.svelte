@@ -5,6 +5,8 @@
 	import moment from 'moment-timezone';
 	import { createNoise2D } from 'simplex-noise';
 
+	import { isMobile } from '$lib/stores/device';
+
 	import type MuxPlayerElement from '@mux/mux-player';
 	import MuxVideo from '$lib/components/MuxVideo.svelte';
 
@@ -99,11 +101,13 @@
 
 	// Reactive statement to update showVideo when timeOfDay changes
 	$: {
-		showVideo = timeOfDay === 'sunrise' || timeOfDay === 'sunset';
+		if (!$isMobile) {
+			showVideo = timeOfDay === 'sunrise' || timeOfDay === 'sunset';
+		}
 	}
 
 	$: {
-		if (muxVideo) {
+		if (muxVideo && !$isMobile) {
 			if (showVideo) {
 				muxVideo?.reset();
 				muxVideo?.play();
@@ -350,32 +354,34 @@
 	{/if}
 </div>
 
-<div
-	class="absolute w-screen h-screen overflow-hidden transition-opacity duration-1000 opacity-0 pointer-events-none aspect-video"
-	class:opacity-100={showVideo}
->
-	<MuxVideo
-		bind:this={muxVideo}
-		playbackId="pZw8Xu5zHfBWZZ1hPKtNM3Nm7LTDHPETrDT7MKO0001zE"
-		metaData={{ videoTitle: 'T.G Shand Scenes Offical Music Video' }}
-		on:ended={() => (showVideo = false)}
-	/>
-	<button
-		on:click={() => {
-			muxVideo?.toggleMute();
-			videoMuted = !videoMuted;
-		}}
-		class="absolute text-white transition-opacity opacity-0 pointer-events-none top-4 right-4"
-		class:!opacity-100={showVideo}
-		class:!pointer-events-auto={showVideo}
+{#if !$isMobile}
+	<div
+		class="absolute w-screen h-screen overflow-hidden transition-opacity duration-1000 opacity-0 pointer-events-none aspect-video"
+		class:opacity-100={showVideo}
 	>
-		{#if videoMuted}
-			<VolumeOff />
-		{:else}
-			<VolumeOn />
-		{/if}
-	</button>
-</div>
+		<MuxVideo
+			bind:this={muxVideo}
+			playbackId="pZw8Xu5zHfBWZZ1hPKtNM3Nm7LTDHPETrDT7MKO0001zE"
+			metaData={{ videoTitle: 'T.G Shand Scenes Offical Music Video' }}
+			on:ended={() => (showVideo = false)}
+		/>
+		<button
+			on:click={() => {
+				muxVideo?.toggleMute();
+				videoMuted = !videoMuted;
+			}}
+			class="absolute text-white transition-opacity opacity-0 pointer-events-none top-4 right-4"
+			class:!opacity-100={showVideo}
+			class:!pointer-events-auto={showVideo}
+		>
+			{#if videoMuted}
+				<VolumeOff />
+			{:else}
+				<VolumeOn />
+			{/if}
+		</button>
+	</div>
+{/if}
 
 <section
 	class="relative z-10 w-[343px] text-white bg-black top-4 left-4 hover:opacity-100 transition-opacity"
