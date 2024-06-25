@@ -8,7 +8,7 @@
 	import type MuxPlayerElement from '@mux/mux-player';
 	import MuxVideo from '$lib/components/MuxVideo.svelte';
 
-	import { getTimeOfDay } from '$lib/utils/helpers';
+	import { getTimeOfDay, toggleFullScreen } from '$lib/utils/helpers';
 
 	import lytDayBG from '$lib/assets/lyt-day.png';
 	import lytDayCloud from '$lib/assets/lyt-day-clouds.png';
@@ -238,6 +238,8 @@
 		birdContainer.style.top = originY;
 	}
 </script>
+
+<svelte:document on:keydown={toggleFullScreen} />
 
 <div class="absolute w-screen h-screen overflow-hidden aspect-video">
 	<div class="absolute top-0 left-0 w-full h-full">
