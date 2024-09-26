@@ -1,3 +1,13 @@
 [build]
 command = "pnpm run build"
 publish = "build"
+
+[[redirects]]
+  from = "/scenes-by-t-g-shand/*"
+  to = "/scenes-by-t-g-shand/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/antarctica-snowman/*"
+  to = "https://cusp-antarctica-snowman.netlify.app/:splat"
+  status = 200
